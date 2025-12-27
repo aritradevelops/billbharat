@@ -1,0 +1,327 @@
+{
+	"info": {
+		"_postman_id": "c1dec7de-e2ef-4e47-949c-4d38af04794b",
+		"name": "BillBharat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49440644",
+		"_collection_link": "https://aritrasadhukhan430-5663509.postman.co/workspace/Aritra-Sadhukhan's-Workspace~6d77a8a3-f4a3-4438-840f-8e2fa81a13ec/collection/49440644-c1dec7de-e2ef-4e47-949c-4d38af04794b?action=share&source=collection_link&creator=49440644"
+	},
+	"item": [
+		{
+			"name": "Auth Service",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test User One\",\n    \"email\": \"testuser1@gmail.com\",\n    \"country_code\": \"+91\",\n    \"phone\": \"1234567890\",\n    \"password\": \"Test@1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\",\n    \"password\": \"Test@1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\",\n    \"password\": \"Test@1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/forgot-password",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\",\n    \"code\": \"472192\",\n    \"password\": \"Test@1234\",\n    \"confirm_password\": \"Test@1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/reset-password",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\",\n    \"code\": \"472192\",\n    \"password\": \"Test@1234\",\n    \"confirm_password\": \"Test@1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/reset-password",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password Copy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\",\n    \"code\": \"472192\",\n    \"password\": \"Test@1234\",\n    \"confirm_password\": \"Test@1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/users/profile/5c010062-4c92-423b-94e6-7c954dd8390e",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"users",
+								"profile",
+								"5c010062-4c92-423b-94e6-7c954dd8390e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\",\n    \"code\": \"033251\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/verify-email",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"verify-email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Phone",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\",\n    \"code\": \"501275\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/verify-phone",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"verify-phone"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Email Verification Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/send-email-verification-request",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"send-email-verification-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Phone Verification Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser1@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/auth-srv/auth/send-phone-verification-request",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth-srv",
+								"auth",
+								"send-phone-verification-request"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
