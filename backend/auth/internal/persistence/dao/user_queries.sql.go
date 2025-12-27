@@ -3,7 +3,7 @@
 //   sqlc v1.30.0
 // source: user_queries.sql
 
-package repository
+package dao
 
 import (
 	"context"
@@ -16,8 +16,8 @@ UPDATE "users" SET deactivated_at = NULL AND updated_by = $2 WHERE id = $1 AND d
 `
 
 type ActivateUserParams struct {
-	ID        uuid.UUID `json:"id"`
-	UpdatedBy uuid.UUID `json:"updated_by"`
+	ID        uuid.UUID  `json:"id"`
+	UpdatedBy *uuid.UUID `json:"updated_by"`
 }
 
 func (q *Queries) ActivateUser(ctx context.Context, arg ActivateUserParams) error {
@@ -25,12 +25,12 @@ func (q *Queries) ActivateUser(ctx context.Context, arg ActivateUserParams) erro
 	return err
 }
 
-const createUser = `-- name: CreateUser :exec
+const createUser = `-- name: CreateUser :one
 INSERT INTO "users" (
-   human_id, name, email, email_verified,  phone, password, created_by
+   human_id, name, email, email_verified,  phone, created_by
 ) VALUES (
-   $1, $2, $3, $4, $5, $6, $7
-) RETURNING id, human_id, name, email, dp, email_verified, phone, phone_verified, password, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by, deleted_at, deleted_by
+   $1, $2, $3, $4, $5, $6
+) RETURNING id, human_id, name, email, dp, email_verified, phone, phone_verified, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by, deleted_at, deleted_by
 `
 
 type CreateUserParams struct {
@@ -39,21 +39,38 @@ type CreateUserParams struct {
 	Email         string    `json:"email"`
 	EmailVerified bool      `json:"email_verified"`
 	Phone         string    `json:"phone"`
-	Password      string    `json:"password"`
 	CreatedBy     uuid.UUID `json:"created_by"`
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.Exec(ctx, createUser,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, createUser,
 		arg.HumanID,
 		arg.Name,
 		arg.Email,
 		arg.EmailVerified,
 		arg.Phone,
-		arg.Password,
 		arg.CreatedBy,
 	)
-	return err
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.HumanID,
+		&i.Name,
+		&i.Email,
+		&i.Dp,
+		&i.EmailVerified,
+		&i.Phone,
+		&i.PhoneVerified,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+		&i.DeactivatedAt,
+		&i.DeactivatedBy,
+		&i.DeletedAt,
+		&i.DeletedBy,
+	)
+	return i, err
 }
 
 const deactivateUser = `-- name: DeactivateUser :exec
@@ -85,7 +102,7 @@ func (q *Queries) DeleteUser(ctx context.Context, arg DeleteUserParams) error {
 }
 
 const findUserByEmail = `-- name: FindUserByEmail :one
-SELECT id, human_id, name, email, dp, email_verified, phone, phone_verified, password, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by, deleted_at, deleted_by FROM "users" WHERE email = $1 AND deleted_at IS NULL
+SELECT id, human_id, name, email, dp, email_verified, phone, phone_verified, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by, deleted_at, deleted_by FROM "users" WHERE email = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, error) {
@@ -100,7 +117,6 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, erro
 		&i.EmailVerified,
 		&i.Phone,
 		&i.PhoneVerified,
-		&i.Password,
 		&i.CreatedAt,
 		&i.CreatedBy,
 		&i.UpdatedAt,
@@ -114,7 +130,7 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, erro
 }
 
 const findUserById = `-- name: FindUserById :one
-SELECT id, human_id, name, email, dp, email_verified, phone, phone_verified, password, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by, deleted_at, deleted_by FROM "users" WHERE id = $1 AND deleted_at IS NULL
+SELECT id, human_id, name, email, dp, email_verified, phone, phone_verified, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by, deleted_at, deleted_by FROM "users" WHERE id = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) FindUserById(ctx context.Context, id uuid.UUID) (User, error) {
@@ -129,7 +145,6 @@ func (q *Queries) FindUserById(ctx context.Context, id uuid.UUID) (User, error) 
 		&i.EmailVerified,
 		&i.Phone,
 		&i.PhoneVerified,
-		&i.Password,
 		&i.CreatedAt,
 		&i.CreatedBy,
 		&i.UpdatedAt,

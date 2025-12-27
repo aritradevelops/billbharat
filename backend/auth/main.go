@@ -27,13 +27,11 @@ func main() {
 	}
 	defer db.Disconnect()
 
-	tx, err := db.Tx()
+	repo, err := repository.New(db)
 	if err != nil {
-		fmt.Println("failed to get transaction engine", err)
+		fmt.Println("failed to create repository", err)
 		return
 	}
-
-	repo := repository.New(tx)
 
 	srv := service.New(repo)
 

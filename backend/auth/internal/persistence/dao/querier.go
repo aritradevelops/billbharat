@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.30.0
 
-package repository
+package dao
 
 import (
 	"context"
@@ -12,14 +12,20 @@ import (
 
 type Querier interface {
 	ActivateUser(ctx context.Context, arg ActivateUserParams) error
+	CreatePassword(ctx context.Context, arg CreatePasswordParams) error
 	CreateSession(ctx context.Context, arg CreateSessionParams) error
-	CreateUser(ctx context.Context, arg CreateUserParams) error
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	CreateVerificationRequest(ctx context.Context, arg CreateVerificationRequestParams) error
 	DeactivateUser(ctx context.Context, arg DeactivateUserParams) error
+	DeletePassword(ctx context.Context, userID uuid.UUID) (int64, error)
 	DeleteSession(ctx context.Context, id uuid.UUID) error
 	DeleteUser(ctx context.Context, arg DeleteUserParams) error
+	FindPasswordByUserId(ctx context.Context, userID uuid.UUID) (Password, error)
 	FindSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error)
 	FindUserByEmail(ctx context.Context, email string) (User, error)
 	FindUserById(ctx context.Context, id uuid.UUID) (User, error)
+	FindVerificationRequestByUserIdAndType(ctx context.Context, arg FindVerificationRequestByUserIdAndTypeParams) (VerificationRequest, error)
+	SetConsumedAt(ctx context.Context, id uuid.UUID) error
 }
 
 var _ Querier = (*Queries)(nil)

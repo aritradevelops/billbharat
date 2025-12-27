@@ -3,9 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"time"
 
 	"github.com/aritradeveops/billbharat/backend/auth/internal/core/cryptoutil"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/core/validation"
+	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/dao"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/logger"
 	"github.com/google/uuid"
@@ -13,12 +16,14 @@ import (
 )
 
 const (
-	DefaultCost          = 10
-	AuthServiceErrorCode = 2000
+	DefaultCost               = 10
+	VerificationRequestExpiry = 15 * time.Minute
 )
 
 var (
-	UserExistsErr = &ServiceError{AuthServiceErrorCode + 1, "user.exists", "user already exists"}
+	RootUserID    uuid.UUID = uuid.Nil
+	UserExistsErr           = &ServiceError{HttpErrorCode: http.StatusConflict,
+		DevErrorCode: "auth_001", Short: "user.exists", Long: "user already exists"}
 )
 
 type RegisterPayload struct {
@@ -37,10 +42,10 @@ type AuthService interface {
 }
 
 type authService struct {
-	repository repository.Querier
+	repository repository.Repository
 }
 
-func NewAuthService(repository repository.Querier) AuthService {
+func NewAuthService(repository repository.Repository) AuthService {
 	return &authService{
 		repository: repository,
 	}
@@ -63,24 +68,67 @@ func (s *authService) Register(ctx context.Context, payload RegisterPayload) (Re
 		return response, UserExistsErr
 	}
 
+	tx, err := s.repository.StartTransaction(ctx)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to start transaction")
+		return response, err
+	}
+	defer tx.Rollback(ctx)
+	repo := s.repository.WithTx(tx)
+
+	user, err := repo.CreateUser(ctx, dao.CreateUserParams{
+		HumanID:       cryptoutil.HumanID("user"),
+		Name:          payload.Name,
+		Email:         payload.Email,
+		Phone:         fmt.Sprintf("%s%s", payload.CountryCode, payload.Phone),
+		EmailVerified: false,
+		CreatedBy:     RootUserID,
+	})
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to create user")
+		return response, err
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to generate password hash")
 		return response, InternalError
 	}
 
-	if err := s.repository.CreateUser(ctx, repository.CreateUserParams{
-		HumanID:       cryptoutil.HumanID("user"),
-		Name:          payload.Name,
-		Email:         payload.Email,
-		Phone:         fmt.Sprintf("%s%s", payload.CountryCode, payload.Phone),
-		Password:      string(hashedPassword),
-		EmailVerified: false,
-		CreatedBy:     uuid.Nil,
-	}); err != nil {
-		logger.Error().Err(err).Msg("failed to create user")
+	err = repo.CreatePassword(ctx, dao.CreatePasswordParams{
+		UserID:    user.ID,
+		Password:  string(hashedPassword),
+		CreatedBy: user.ID,
+	})
+
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to create password")
 		return response, err
 	}
-	// TODO: send verification email
+
+	otp, err := cryptoutil.GeneratOTP(6)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to generate otp")
+		return response, err
+	}
+
+	err = repo.CreateVerificationRequest(ctx, dao.CreateVerificationRequestParams{
+		UserID:    user.ID,
+		Code:      otp,
+		Type:      dao.VerificationTypeEmail,
+		ExpiresAt: time.Now().Add(VerificationRequestExpiry),
+		CreatedBy: user.ID,
+	})
+
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to create verification request")
+		return response, err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		logger.Error().Err(err).Msg("failed to commit transaction")
+		return response, err
+	}
+
 	return response, nil
 }

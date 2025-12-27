@@ -6,7 +6,7 @@ type Service struct {
 	Auth AuthService
 }
 
-func New(repository repository.Querier) *Service {
+func New(repository repository.Repository) *Service {
 	return &Service{
 		Auth: NewAuthService(repository),
 	}

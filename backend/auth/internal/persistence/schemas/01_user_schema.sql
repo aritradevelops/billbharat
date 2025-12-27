@@ -7,7 +7,6 @@ CREATE TABLE "users" (
   email_verified bool NOT NULL DEFAULT false,
   phone VARCHAR(16) NOT NULL,
   phone_verified bool NOT NULL DEFAULT false,
-  password VARCHAR(255) NOT NULL,
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_by uuid NOT NULL,
   updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,

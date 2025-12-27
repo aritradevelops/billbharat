@@ -1,8 +1,8 @@
--- name: CreateUser :exec
+-- name: CreateUser :one
 INSERT INTO "users" (
-   human_id, name, email, email_verified,  phone, password, created_by
+   human_id, name, email, email_verified,  phone, created_by
 ) VALUES (
-   $1, $2, $3, $4, $5, $6, $7
+   $1, $2, $3, $4, $5, $6
 ) RETURNING *;
 
 -- name: FindUserByEmail :one

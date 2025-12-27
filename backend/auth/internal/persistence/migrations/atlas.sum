@@ -1,3 +1,6 @@
-h1:LrSLl48oVyfe/dKmQeiHxiNkDzdWoDY6yGz80JW0P58=
+h1:+yaCtJPFMKuxdUl989LoVKS959ykiuBiKwid86IsBss=
 20251226183900_user_and_sessions.sql h1:0DbyCocw/YJJm3tvgexpY/X4H2hxcvTyf1GaMMMGZ+4=
 20251226184519_user_and_sessions_2.sql h1:NJ5ribmKRWYs6yPqKDLAcN21VNeC65HiboHpKWcJW6g=
+20251227062915_user_and_sessions_3.sql h1:FhkZ+m3C7tUqNAXNbNZVwTDXDkia8H+PjC1lSEQrTzc=
+20251227102526_email_verification_requests.sql h1:rTQmI05I+UFndjHxctkoFdbSRhCkoT3jNnHahFtflJc=
+20251227102950_password_created_at.sql h1:rnJZbLlzoqMYppxeHXtXApDO8yx30R8WC03P6xBL0cA=

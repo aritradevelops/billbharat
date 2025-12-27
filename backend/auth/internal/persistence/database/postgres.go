@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -13,7 +12,7 @@ type Database interface {
 	Connect() error
 	Disconnect() error
 	Health() error
-	Tx() (repository.DBTX, error)
+	Tx() (*pgxpool.Pool, error)
 }
 
 func NotInitializedErr(what string) error {
@@ -66,7 +65,7 @@ func (p *Postgres) Health() error {
 	return nil
 }
 
-func (p *Postgres) Tx() (repository.DBTX, error) {
+func (p *Postgres) Tx() (*pgxpool.Pool, error) {
 	if p.pool == nil {
 		return nil, NotInitializedErr("Postgres")
 	}

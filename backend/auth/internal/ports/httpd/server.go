@@ -3,6 +3,7 @@ package httpd
 import (
 	"fmt"
 
+	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/translation"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/handlers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -17,13 +18,16 @@ type Server struct {
 }
 
 func NewServer(host string, port int, handlers *handlers.Handler) *Server {
-	app := fiber.New(fiber.Config{})
+	app := fiber.New(fiber.Config{
+		ErrorHandler: ErrorHandler(),
+	})
 	app.Use(recover.New(
 		recover.Config{
 			EnableStackTrace: true,
 		},
 	))
 	app.Use(logger.New())
+	app.Use(translation.New())
 	server := &Server{
 		host:     host,
 		port:     port,
