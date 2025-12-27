@@ -1,0 +1,21 @@
+-- name: CreateUser :exec
+INSERT INTO "users" (
+   human_id, name, email, email_verified,  phone, password, created_by
+) VALUES (
+   $1, $2, $3, $4, $5, $6, $7
+) RETURNING *;
+
+-- name: FindUserByEmail :one
+SELECT * FROM "users" WHERE email = $1 AND deleted_at IS NULL;
+
+-- name: FindUserById :one
+SELECT * FROM "users" WHERE id = $1 AND deleted_at IS NULL;
+
+-- name: DeleteUser :exec
+UPDATE "users" SET deleted_at = CURRENT_TIMESTAMP AND deleted_by = $2 WHERE id = $1 AND deleted_at IS NULL;
+
+-- name: DeactivateUser :exec
+UPDATE "users" SET deactivated_at = CURRENT_TIMESTAMP AND deactivated_by = $2 WHERE id = $1 AND deactivated_at IS NULL AND deleted_at IS NULL;
+
+-- name: ActivateUser :exec
+UPDATE "users" SET deactivated_at = NULL AND updated_by = $2 WHERE id = $1 AND deactivated_at IS NOT NULL AND deleted_at IS NULL;

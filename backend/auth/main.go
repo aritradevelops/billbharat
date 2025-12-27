@@ -1,0 +1,49 @@
+package main
+
+import (
+	"fmt"
+
+	"github.com/aritradeveops/billbharat/backend/auth/internal/config"
+	"github.com/aritradeveops/billbharat/backend/auth/internal/core/service"
+	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/database"
+	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
+	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd"
+	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/handlers"
+)
+
+func main() {
+	conf, err := config.Load()
+	if err != nil {
+		fmt.Println("failed to load config", err)
+		return
+	}
+
+	db := database.NewPostgres(conf.Database.Uri, conf.Database.Timeout)
+
+	err = db.Connect()
+	if err != nil {
+		fmt.Println("failed to connect to database", err)
+		return
+	}
+	defer db.Disconnect()
+
+	tx, err := db.Tx()
+	if err != nil {
+		fmt.Println("failed to get transaction engine", err)
+		return
+	}
+
+	repo := repository.New(tx)
+
+	srv := service.New(repo)
+
+	handler := handlers.New(db, srv)
+
+	server := httpd.NewServer(conf.Http.Host, conf.Http.Port, handler)
+	server.SetupRoutes()
+
+	if err := server.Start(); err != nil {
+		fmt.Println("server failed to start", err)
+		return
+	}
+}
