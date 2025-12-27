@@ -37,7 +37,8 @@ func (q *Queries) CreateVerificationRequest(ctx context.Context, arg CreateVerif
 }
 
 const findVerificationRequestByUserIdAndType = `-- name: FindVerificationRequestByUserIdAndType :one
-SELECT id, user_id, type, code, expires_at, created_at, created_by, consumed_at FROM "verification_requests" WHERE "user_id" = $1 AND "type" = $2 AND "expires_at" > CURRENT_TIMESTAMP AND "consumed_at" IS NULL
+SELECT id, user_id, type, code, expires_at, created_at, created_by, consumed_at FROM "verification_requests" WHERE "user_id" = $1 AND "type" = $2 
+AND "expires_at" > CURRENT_TIMESTAMP AND "consumed_at" IS NULL ORDER BY "created_at" DESC LIMIT 1
 `
 
 type FindVerificationRequestByUserIdAndTypeParams struct {
@@ -61,11 +62,11 @@ func (q *Queries) FindVerificationRequestByUserIdAndType(ctx context.Context, ar
 	return i, err
 }
 
-const setConsumedAt = `-- name: SetConsumedAt :exec
+const setVerificationRequestConsumedAt = `-- name: SetVerificationRequestConsumedAt :exec
 UPDATE "verification_requests" SET "consumed_at" = CURRENT_TIMESTAMP WHERE "id" = $1 AND "consumed_at" IS NULL
 `
 
-func (q *Queries) SetConsumedAt(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, setConsumedAt, id)
+func (q *Queries) SetVerificationRequestConsumedAt(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, setVerificationRequestConsumedAt, id)
 	return err
 }

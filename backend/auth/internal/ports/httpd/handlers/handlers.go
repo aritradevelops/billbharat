@@ -8,11 +8,13 @@ import (
 type Handler struct {
 	db   database.Database
 	Auth *AuthHandler
+	User *UserHandler
 }
 
 func New(db database.Database, service *service.Service) *Handler {
 	return &Handler{
 		db:   db,
 		Auth: NewAuthHandler(service.Auth),
+		User: NewUserHandler(service.User),
 	}
 }

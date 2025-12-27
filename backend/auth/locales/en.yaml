@@ -27,8 +27,25 @@ validation:
 auth:
   register: "User registered successfully."
   login: "User logged in successfully."
+  verify_email: "Email verified successfully."
+  forgot_password: "Password reset email sent successfully."
+  reset_password: "Password reset successfully."
+  change_password: "Password changed successfully."
+  send_phone_verification_request: "Phone verification request sent successfully."
+  send_email_verification_request: "Email verification request sent successfully."
 user:
+  profile: "Profile fetched successfully."
   exists: "User already exists."
+  not_found: "User not found."
   deactivated: "User account deactivated."
   invalid_credentials: "Invalid email or password."
   invalid_method: "Invalid login method."
+  email_verified: "Email is already verified."
+  phone_verified: "Phone is already verified."
+  update_dp: "Profile picture updated successfully."
+verification_request:
+  expired: "Verification request expired."
+  invalid_code: "Invalid verification code."
+password:
+  already_used: "Password is already used."
+  

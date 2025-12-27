@@ -3,6 +3,7 @@ package httpd
 import (
 	"fmt"
 
+	"github.com/aritradeveops/billbharat/backend/auth/internal/core/jwtutil"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/translation"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/handlers"
 	"github.com/gofiber/fiber/v2"
@@ -11,13 +12,14 @@ import (
 )
 
 type Server struct {
-	host     string
-	port     int
-	app      *fiber.App
-	handlers *handlers.Handler
+	host       string
+	port       int
+	app        *fiber.App
+	handlers   *handlers.Handler
+	jwtManager *jwtutil.JwtManager
 }
 
-func NewServer(host string, port int, handlers *handlers.Handler) *Server {
+func NewServer(host string, port int, handlers *handlers.Handler, jwtManager *jwtutil.JwtManager) *Server {
 	app := fiber.New(fiber.Config{
 		ErrorHandler: ErrorHandler(),
 	})
@@ -29,10 +31,11 @@ func NewServer(host string, port int, handlers *handlers.Handler) *Server {
 	app.Use(logger.New())
 	app.Use(translation.New())
 	server := &Server{
-		host:     host,
-		port:     port,
-		app:      app,
-		handlers: handlers,
+		host:       host,
+		port:       port,
+		app:        app,
+		handlers:   handlers,
+		jwtManager: jwtManager,
 	}
 	return server
 }

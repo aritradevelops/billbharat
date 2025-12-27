@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const activateUser = `-- name: ActivateUser :exec
@@ -135,6 +136,57 @@ SELECT id, human_id, name, email, dp, email_verified, phone, phone_verified, cre
 
 func (q *Queries) FindUserById(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRow(ctx, findUserById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.HumanID,
+		&i.Name,
+		&i.Email,
+		&i.Dp,
+		&i.EmailVerified,
+		&i.Phone,
+		&i.PhoneVerified,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+		&i.DeactivatedAt,
+		&i.DeactivatedBy,
+		&i.DeletedAt,
+		&i.DeletedBy,
+	)
+	return i, err
+}
+
+const setUserEmailVerified = `-- name: SetUserEmailVerified :exec
+UPDATE "users" SET email_verified = true WHERE id = $1 AND deleted_at IS NULL
+`
+
+func (q *Queries) SetUserEmailVerified(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, setUserEmailVerified, id)
+	return err
+}
+
+const setUserPhoneVerified = `-- name: SetUserPhoneVerified :exec
+UPDATE "users" SET phone_verified = true WHERE id = $1 AND deleted_at IS NULL
+`
+
+func (q *Queries) SetUserPhoneVerified(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, setUserPhoneVerified, id)
+	return err
+}
+
+const updateUserDP = `-- name: UpdateUserDP :one
+UPDATE "users" SET dp = $2 WHERE id = $1 AND deleted_at IS NULL RETURNING id, human_id, name, email, dp, email_verified, phone, phone_verified, created_at, created_by, updated_at, updated_by, deactivated_at, deactivated_by, deleted_at, deleted_by
+`
+
+type UpdateUserDPParams struct {
+	ID uuid.UUID   `json:"id"`
+	Dp pgtype.Text `json:"dp"`
+}
+
+func (q *Queries) UpdateUserDP(ctx context.Context, arg UpdateUserDPParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserDP, arg.ID, arg.Dp)
 	var i User
 	err := row.Scan(
 		&i.ID,

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/aritradeveops/billbharat/backend/auth/internal/config"
+	"github.com/aritradeveops/billbharat/backend/auth/internal/core/jwtutil"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/core/service"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/database"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
@@ -32,12 +33,13 @@ func main() {
 		fmt.Println("failed to create repository", err)
 		return
 	}
+	jwtManager := jwtutil.NewJwtManager(conf.Jwt.Secret, conf.Jwt.Lifetime.Duration())
 
-	srv := service.New(repo)
+	srv := service.New(repo, jwtManager)
 
 	handler := handlers.New(db, srv)
 
-	server := httpd.NewServer(conf.Http.Host, conf.Http.Port, handler)
+	server := httpd.NewServer(conf.Http.Host, conf.Http.Port, handler, jwtManager)
 	server.SetupRoutes()
 
 	if err := server.Start(); err != nil {

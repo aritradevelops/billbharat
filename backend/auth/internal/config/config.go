@@ -6,6 +6,7 @@ import (
 
 	// autoload the environment variables
 
+	"github.com/aritradeveops/billbharat/backend/auth/pkg/timex"
 	"github.com/caarlos0/env/v10"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -16,6 +17,7 @@ type Config struct {
 	Service    Service    `envPrefix:"SERVICE_"`
 	Grpc       Grpc       `envPrefix:"GRPC_"`
 	Deployment Deployment `envPrefix:"DEPLOYMENT_"`
+	Jwt        Jwt        `envPrefix:"JWT_"`
 }
 
 type Http struct {
@@ -39,6 +41,11 @@ type Grpc struct {
 
 type Deployment struct {
 	Env string `env:"ENV,required"`
+}
+
+type Jwt struct {
+	Secret   string         `env:"SECRET,required"`
+	Lifetime timex.Duration `env:"LIFETIME,required"`
 }
 
 func Load() (Config, error) {

@@ -3,7 +3,8 @@ INSERT INTO "verification_requests" ("user_id", "type", "code", "expires_at", "c
 VALUES ($1, $2, $3, $4, $5);
 
 -- name: FindVerificationRequestByUserIdAndType :one
-SELECT * FROM "verification_requests" WHERE "user_id" = $1 AND "type" = $2 AND "expires_at" > CURRENT_TIMESTAMP AND "consumed_at" IS NULL;
+SELECT * FROM "verification_requests" WHERE "user_id" = $1 AND "type" = $2 
+AND "expires_at" > CURRENT_TIMESTAMP AND "consumed_at" IS NULL ORDER BY "created_at" DESC LIMIT 1;
 
--- name: SetConsumedAt :exec
+-- name: SetVerificationRequestConsumedAt :exec
 UPDATE "verification_requests" SET "consumed_at" = CURRENT_TIMESTAMP WHERE "id" = $1 AND "consumed_at" IS NULL;

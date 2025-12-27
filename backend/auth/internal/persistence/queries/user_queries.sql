@@ -19,3 +19,12 @@ UPDATE "users" SET deactivated_at = CURRENT_TIMESTAMP AND deactivated_by = $2 WH
 
 -- name: ActivateUser :exec
 UPDATE "users" SET deactivated_at = NULL AND updated_by = $2 WHERE id = $1 AND deactivated_at IS NOT NULL AND deleted_at IS NULL;
+
+-- name: SetUserEmailVerified :exec
+UPDATE "users" SET email_verified = true WHERE id = $1 AND deleted_at IS NULL;
+
+-- name: SetUserPhoneVerified :exec
+UPDATE "users" SET phone_verified = true WHERE id = $1 AND deleted_at IS NULL;
+
+-- name: UpdateUserDP :one
+UPDATE "users" SET dp = $2 WHERE id = $1 AND deleted_at IS NULL RETURNING *;

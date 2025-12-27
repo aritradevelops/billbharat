@@ -28,15 +28,52 @@ func (q *Queries) CreatePassword(ctx context.Context, arg CreatePasswordParams) 
 }
 
 const deletePassword = `-- name: DeletePassword :execrows
-DELETE FROM "passwords" WHERE "user_id" = $1 AND "deleted_at" IS NULL
+UPDATE "passwords" SET "deleted_at" = now(), "deleted_by" = $2 WHERE "user_id" = $1 AND "deleted_at" IS NULL
 `
 
-func (q *Queries) DeletePassword(ctx context.Context, userID uuid.UUID) (int64, error) {
-	result, err := q.db.Exec(ctx, deletePassword, userID)
+type DeletePasswordParams struct {
+	UserID    uuid.UUID  `json:"user_id"`
+	DeletedBy *uuid.UUID `json:"deleted_by"`
+}
+
+func (q *Queries) DeletePassword(ctx context.Context, arg DeletePasswordParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deletePassword, arg.UserID, arg.DeletedBy)
 	if err != nil {
 		return 0, err
 	}
 	return result.RowsAffected(), nil
+}
+
+const findLastFourPasswordsByUserId = `-- name: FindLastFourPasswordsByUserId :many
+SELECT id, user_id, password, created_at, created_by, deleted_at, deleted_by FROM "passwords" WHERE "user_id" = $1 ORDER BY "created_at" DESC LIMIT 4
+`
+
+func (q *Queries) FindLastFourPasswordsByUserId(ctx context.Context, userID uuid.UUID) ([]Password, error) {
+	rows, err := q.db.Query(ctx, findLastFourPasswordsByUserId, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Password
+	for rows.Next() {
+		var i Password
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Password,
+			&i.CreatedAt,
+			&i.CreatedBy,
+			&i.DeletedAt,
+			&i.DeletedBy,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const findPasswordByUserId = `-- name: FindPasswordByUserId :one

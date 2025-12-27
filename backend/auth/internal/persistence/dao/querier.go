@@ -17,15 +17,19 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateVerificationRequest(ctx context.Context, arg CreateVerificationRequestParams) error
 	DeactivateUser(ctx context.Context, arg DeactivateUserParams) error
-	DeletePassword(ctx context.Context, userID uuid.UUID) (int64, error)
+	DeletePassword(ctx context.Context, arg DeletePasswordParams) (int64, error)
 	DeleteSession(ctx context.Context, id uuid.UUID) error
 	DeleteUser(ctx context.Context, arg DeleteUserParams) error
+	FindLastFourPasswordsByUserId(ctx context.Context, userID uuid.UUID) ([]Password, error)
 	FindPasswordByUserId(ctx context.Context, userID uuid.UUID) (Password, error)
 	FindSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error)
 	FindUserByEmail(ctx context.Context, email string) (User, error)
 	FindUserById(ctx context.Context, id uuid.UUID) (User, error)
 	FindVerificationRequestByUserIdAndType(ctx context.Context, arg FindVerificationRequestByUserIdAndTypeParams) (VerificationRequest, error)
-	SetConsumedAt(ctx context.Context, id uuid.UUID) error
+	SetUserEmailVerified(ctx context.Context, id uuid.UUID) error
+	SetUserPhoneVerified(ctx context.Context, id uuid.UUID) error
+	SetVerificationRequestConsumedAt(ctx context.Context, id uuid.UUID) error
+	UpdateUserDP(ctx context.Context, arg UpdateUserDPParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

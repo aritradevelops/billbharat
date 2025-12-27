@@ -13,7 +13,7 @@ import (
 
 func ErrorHandler() fiber.ErrorHandler {
 	return func(c *fiber.Ctx, err error) error {
-		logger.Error().Err(err).Msg("request failed")
+		logger.Error().Type("type", err).Err(err).Msg("request failed")
 
 		if e, ok := err.(*fiber.Error); ok {
 			c.Status(e.Code)
