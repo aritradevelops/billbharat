@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/logger"
+	"github.com/aritradeveops/billbharat/backend/shared/logger"
 	"github.com/gofiber/fiber/v2"
 )
 

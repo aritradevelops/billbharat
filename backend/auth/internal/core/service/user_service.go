@@ -5,7 +5,7 @@ import (
 
 	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/dao"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/logger"
+	"github.com/aritradeveops/billbharat/backend/shared/logger"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )

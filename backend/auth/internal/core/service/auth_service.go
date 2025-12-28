@@ -11,7 +11,8 @@ import (
 	"github.com/aritradeveops/billbharat/backend/auth/internal/core/validation"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/dao"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/logger"
+	"github.com/aritradeveops/billbharat/backend/shared/eventbroker"
+	"github.com/aritradeveops/billbharat/backend/shared/logger"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -156,14 +157,16 @@ type ChangePasswordResponse struct {
 }
 
 type authService struct {
-	repository repository.Repository
-	jwtManager *jwtutil.JwtManager
+	repository  repository.Repository
+	eventBroker eventbroker.Producer
+	jwtManager  *jwtutil.JwtManager
 }
 
-func NewAuthService(repository repository.Repository, jwtManager *jwtutil.JwtManager) AuthService {
+func NewAuthService(repository repository.Repository, jwtManager *jwtutil.JwtManager, eventBroker eventbroker.Producer) AuthService {
 	return &authService{
-		repository: repository,
-		jwtManager: jwtManager,
+		repository:  repository,
+		jwtManager:  jwtManager,
+		eventBroker: eventBroker,
 	}
 }
 

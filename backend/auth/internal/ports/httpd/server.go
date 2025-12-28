@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/aritradeveops/billbharat/backend/auth/internal/core/jwtutil"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/translation"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/handlers"
+	"github.com/aritradeveops/billbharat/backend/shared/translation"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"

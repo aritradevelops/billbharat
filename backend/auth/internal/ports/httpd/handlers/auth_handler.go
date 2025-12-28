@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"github.com/aritradeveops/billbharat/backend/auth/internal/core/service"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/translation"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/authn"
+	"github.com/aritradeveops/billbharat/backend/shared/translation"
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -16,4 +16,9 @@ tasks:
   kafka:down:
     cmds:
       - docker-compose -f ./kafka/docker-compose.yml down
-    
+  postgres:up:
+    cmds:
+      - docker-compose -f ./postgres/docker-compose.yml up -d
+  postgres:down:
+    cmds:
+      - docker-compose -f ./postgres/docker-compose.yml down

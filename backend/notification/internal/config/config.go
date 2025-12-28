@@ -5,7 +5,6 @@ import (
 	"time"
 
 	// autoload the environment variables
-
 	"github.com/aritradeveops/billbharat/backend/shared/timex"
 	"github.com/caarlos0/env/v10"
 	_ "github.com/joho/godotenv/autoload"
@@ -15,7 +14,6 @@ type Config struct {
 	Http        Http        `envPrefix:"HTTP_"`
 	Database    Database    `envPrefix:"DATABASE_"`
 	Service     Service     `envPrefix:"SERVICE_"`
-	Grpc        Grpc        `envPrefix:"GRPC_"`
 	Deployment  Deployment  `envPrefix:"DEPLOYMENT_"`
 	Jwt         Jwt         `envPrefix:"JWT_"`
 	EventBroker EventBroker `envPrefix:"EVENT_BROKER_"`
@@ -33,11 +31,6 @@ type Database struct {
 
 type Service struct {
 	Name string `env:"NAME,required"`
-}
-
-type Grpc struct {
-	Host string `env:"HOST,required"`
-	Port int    `env:"PORT,required"`
 }
 
 type Deployment struct {

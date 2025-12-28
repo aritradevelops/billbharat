@@ -4,7 +4,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/logger"
+	"github.com/aritradeveops/billbharat/backend/shared/logger"
 	"github.com/gofiber/contrib/fiberi18n/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nicksnyder/go-i18n/v2/i18n"

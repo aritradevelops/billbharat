@@ -2,6 +2,8 @@ package eventbroker
 
 import (
 	"encoding/json"
+
+	"github.com/aritradeveops/billbharat/backend/shared/logger"
 )
 
 type Event interface {
@@ -28,6 +30,7 @@ func (e *JSONEvent) Topic() string {
 func (e *JSONEvent) Data() []byte {
 	data, err := json.Marshal(e.data)
 	if err != nil {
+		logger.Error().Err(err).Msg("failed to marshal event data")
 		panic(err)
 	}
 	return data

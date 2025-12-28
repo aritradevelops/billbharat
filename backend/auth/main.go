@@ -10,6 +10,7 @@ import (
 	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/handlers"
+	"github.com/aritradeveops/billbharat/backend/shared/eventbroker"
 )
 
 func main() {
@@ -35,9 +36,11 @@ func main() {
 	}
 	jwtManager := jwtutil.NewJwtManager(conf.Jwt.Secret, conf.Jwt.Lifetime.Duration())
 
-	srv := service.New(repo, jwtManager)
+	eventBroker := eventbroker.NewKafkaProducer(conf.EventBroker.Servers)
 
-	handler := handlers.New(db, srv)
+	srv := service.New(repo, jwtManager, eventBroker)
+
+	handler := handlers.New(db, srv, eventBroker)
 
 	server := httpd.NewServer(conf.Http.Host, conf.Http.Port, handler, jwtManager)
 	server.SetupRoutes()

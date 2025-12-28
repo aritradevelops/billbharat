@@ -1,0 +1,14 @@
+services:
+  db:
+    container_name: postgres-billbharat
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=billbharat
+      - POSTGRES_EXTENSIONS=pgcrypto
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./scripts:/docker-entrypoint-initdb.d
+      - ./data:/var/lib/postgresql/data

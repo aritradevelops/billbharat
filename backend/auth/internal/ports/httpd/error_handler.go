@@ -5,9 +5,9 @@ import (
 
 	"github.com/aritradeveops/billbharat/backend/auth/internal/core/service"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/core/validation"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/logger"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/pkg/translation"
 	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/handlers"
+	"github.com/aritradeveops/billbharat/backend/shared/logger"
+	"github.com/aritradeveops/billbharat/backend/shared/translation"
 	"github.com/gofiber/fiber/v2"
 )
 
