@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/aritradeveops/billbharat/backend/auth/internal/core/jwtutil"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
-	"github.com/aritradeveops/billbharat/backend/shared/eventbroker"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/core/jwtutil"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/repository"
+	"github.com/aritradevelops/billbharat/backend/shared/eventbroker"
 )
 
 type Service struct {

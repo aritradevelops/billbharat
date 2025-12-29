@@ -8,7 +8,7 @@ import (
 	"mime"
 	"path"
 
-	"github.com/aritradeveops/billbharat/backend/notification/internal/persistence/dao"
+	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/dao"
 	"github.com/google/uuid"
 )
 

@@ -1,6 +1,6 @@
 package httpd
 
-import "github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/authn"
+import "github.com/aritradevelops/billbharat/backend/auth/internal/ports/httpd/authn"
 
 func (s *Server) SetupRoutes() {
 	router := s.app

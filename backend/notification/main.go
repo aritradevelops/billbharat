@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aritradeveops/billbharat/backend/notification/internal/config"
-	"github.com/aritradeveops/billbharat/backend/notification/internal/persistence/dao"
-	"github.com/aritradeveops/billbharat/backend/notification/internal/persistence/database"
-	"github.com/aritradeveops/billbharat/backend/notification/internal/persistence/repository"
-	"github.com/aritradeveops/billbharat/backend/shared/logger"
+	"github.com/aritradevelops/billbharat/backend/notification/internal/config"
+	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/dao"
+	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/database"
+	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/repository"
+	"github.com/aritradevelops/billbharat/backend/shared/logger"
 )
 
 func main() {

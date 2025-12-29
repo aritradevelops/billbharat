@@ -3,14 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/aritradeveops/billbharat/backend/auth/internal/config"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/core/jwtutil"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/core/service"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/database"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/repository"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/handlers"
-	"github.com/aritradeveops/billbharat/backend/shared/eventbroker"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/config"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/core/jwtutil"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/core/service"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/database"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/repository"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/ports/httpd"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/ports/httpd/handlers"
+	"github.com/aritradevelops/billbharat/backend/shared/eventbroker"
 )
 
 func main() {

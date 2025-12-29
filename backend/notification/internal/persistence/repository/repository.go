@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/aritradeveops/billbharat/backend/notification/internal/persistence/dao"
-	"github.com/aritradeveops/billbharat/backend/notification/internal/persistence/database"
+	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/dao"
+	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/database"
 )
 
 type FindTemplateParams struct {

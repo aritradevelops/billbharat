@@ -6,7 +6,7 @@ import (
 
 	// autoload the environment variables
 
-	"github.com/aritradeveops/billbharat/backend/shared/timex"
+	"github.com/aritradevelops/billbharat/backend/shared/timex"
 	"github.com/caarlos0/env/v10"
 	_ "github.com/joho/godotenv/autoload"
 )

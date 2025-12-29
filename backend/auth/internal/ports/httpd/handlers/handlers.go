@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/aritradeveops/billbharat/backend/auth/internal/core/service"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/database"
-	"github.com/aritradeveops/billbharat/backend/shared/eventbroker"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/core/service"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/database"
+	"github.com/aritradevelops/billbharat/backend/shared/eventbroker"
 )
 
 type Handler struct {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/aritradeveops/billbharat/backend/shared/logger"
+	"github.com/aritradevelops/billbharat/backend/shared/logger"
 	kafka "github.com/segmentio/kafka-go"
 )
 

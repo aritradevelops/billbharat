@@ -1,5 +1,5 @@
 services:
-  db:
+  postgres:
     container_name: postgres-billbharat
     image: postgres:15-alpine
     environment:

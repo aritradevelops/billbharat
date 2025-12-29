@@ -22,3 +22,19 @@ tasks:
   postgres:down:
     cmds:
       - docker-compose -f ./postgres/docker-compose.yml down
+  mongodb:up:
+    cmds:
+      - docker-compose -f ./mongodb/docker-compose.yml up -d
+  mongodb:down:
+    cmds:
+      - docker-compose -f ./mongodb/docker-compose.yml down
+  all:up:
+    cmds:
+      - task: kafka:up
+      - task: postgres:up
+      - task: mongodb:up
+  all:down:
+    cmds:
+      - task: kafka:down
+      - task: postgres:down
+      - task: mongodb:down

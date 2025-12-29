@@ -3,7 +3,7 @@ package eventbroker
 import (
 	"encoding/json"
 
-	"github.com/aritradeveops/billbharat/backend/shared/logger"
+	"github.com/aritradevelops/billbharat/backend/shared/logger"
 )
 
 type Event interface {

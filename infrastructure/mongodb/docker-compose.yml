@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    container_name: mongodb-billbharat
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongodb
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db

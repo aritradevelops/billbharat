@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/aritradeveops/billbharat/backend/shared/logger"
+	"github.com/aritradevelops/billbharat/backend/shared/logger"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )

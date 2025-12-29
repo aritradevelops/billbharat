@@ -3,11 +3,11 @@ package httpd
 import (
 	"fmt"
 
-	"github.com/aritradeveops/billbharat/backend/auth/internal/core/service"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/core/validation"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/ports/httpd/handlers"
-	"github.com/aritradeveops/billbharat/backend/shared/logger"
-	"github.com/aritradeveops/billbharat/backend/shared/translation"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/core/service"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/core/validation"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/ports/httpd/handlers"
+	"github.com/aritradevelops/billbharat/backend/shared/logger"
+	"github.com/aritradevelops/billbharat/backend/shared/translation"
 	"github.com/gofiber/fiber/v2"
 )
 

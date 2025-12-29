@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aritradeveops/billbharat/backend/auth/internal/core/jwtutil"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/core/jwtutil"
 	"github.com/gofiber/fiber/v2"
 )
 

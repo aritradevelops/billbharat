@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/dao"
-	"github.com/aritradeveops/billbharat/backend/auth/internal/persistence/database"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/dao"
+	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/database"
 	"github.com/jackc/pgx/v5"
 )
 
