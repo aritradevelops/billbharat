@@ -11,8 +11,9 @@ import (
 	"github.com/aritradevelops/billbharat/backend/auth/internal/core/validation"
 	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/dao"
 	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/repository"
-	"github.com/aritradevelops/billbharat/backend/shared/eventbroker"
+	"github.com/aritradevelops/billbharat/backend/shared/events"
 	"github.com/aritradevelops/billbharat/backend/shared/logger"
+	"github.com/aritradevelops/billbharat/backend/shared/notification"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -66,7 +67,6 @@ type AuthService interface {
 	VerifyPhone(ctx context.Context, payload VerifyPhonePayload) (VerifyPhoneResponse, error)
 	SendEmailVerificationRequest(ctx context.Context, payload SendEmailVerificationRequestPayload) (SendEmailVerificationRequestResponse, error)
 	SendPhoneVerificationRequest(ctx context.Context, payload SendPhoneVerificationRequestPayload) (SendPhoneVerificationRequestResponse, error)
-	Profile(ctx context.Context, initiator string, payload ProfilePayload) (ProfileResponse, error)
 }
 
 type RegisterPayload struct {
@@ -157,16 +157,16 @@ type ChangePasswordResponse struct {
 }
 
 type authService struct {
-	repository  repository.Repository
-	eventBroker eventbroker.Producer
-	jwtManager  *jwtutil.JwtManager
+	repository   repository.Repository
+	eventManager events.EventManager
+	jwtManager   *jwtutil.JwtManager
 }
 
-func NewAuthService(repository repository.Repository, jwtManager *jwtutil.JwtManager, eventBroker eventbroker.Producer) AuthService {
+func NewAuthService(repository repository.Repository, jwtManager *jwtutil.JwtManager, eventManager events.EventManager) AuthService {
 	return &authService{
-		repository:  repository,
-		jwtManager:  jwtManager,
-		eventBroker: eventBroker,
+		repository:   repository,
+		jwtManager:   jwtManager,
+		eventManager: eventManager,
 	}
 }
 
@@ -204,6 +204,7 @@ func (s *authService) Register(ctx context.Context, payload RegisterPayload) (Re
 		EmailVerified: false,
 		CreatedBy:     RootUserID,
 	})
+
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create user")
 		return response, err
@@ -263,11 +264,11 @@ func (s *authService) Register(ctx context.Context, payload RegisterPayload) (Re
 		return response, err
 	}
 
+	s.eventManager.EmitManageUserEvent(ctx, events.NewUserManageEvent("create", events.ManageUserEventPayload(user)))
 	response.ID = user.ID
 	response.Name = user.Name
 	response.Email = user.Email
 	response.Phone = user.Phone
-
 	return response, nil
 }
 
@@ -300,7 +301,7 @@ func (s *authService) VerifyEmail(ctx context.Context, payload VerifyEmailPayloa
 		return response, InvalidVerificationCodeErr
 	}
 
-	err = s.repository.SetUserEmailVerified(ctx, user.ID)
+	user, err = s.repository.SetUserEmailVerified(ctx, user.ID)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to set user email verified")
 		return response, err
@@ -309,6 +310,25 @@ func (s *authService) VerifyEmail(ctx context.Context, payload VerifyEmailPayloa
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to set verification request consumed at")
 		return response, err
+	}
+	err = s.eventManager.EmitManageUserEvent(ctx, events.NewUserManageEvent("update", events.ManageUserEventPayload(user)))
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to emit manage user event")
+		return response, InternalError
+	}
+	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.MangageNotificationEventPayload{
+		Event: notification.EmailVerifiedEvent,
+		Channels: []notification.Channel[any]{
+			{
+				Type: notification.EMAIL,
+				Data: notification.NewEmailChannel([]string{user.Email}, []string{}, []string{}, notification.P2P),
+			},
+		},
+	}))
+
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to emit manage notification event")
+		return response, InternalError
 	}
 
 	return response, nil
@@ -343,7 +363,7 @@ func (s *authService) VerifyPhone(ctx context.Context, payload VerifyPhonePayloa
 		return response, InvalidVerificationCodeErr
 	}
 
-	err = s.repository.SetUserPhoneVerified(ctx, user.ID)
+	user, err = s.repository.SetUserPhoneVerified(ctx, user.ID)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to set user phone verified")
 		return response, err
@@ -353,7 +373,11 @@ func (s *authService) VerifyPhone(ctx context.Context, payload VerifyPhonePayloa
 		logger.Error().Err(err).Msg("failed to set verification request consumed at")
 		return response, err
 	}
-
+	err = s.eventManager.EmitManageUserEvent(ctx, events.NewUserManageEvent("update", events.ManageUserEventPayload(user)))
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to emit manage user event")
+		return response, InternalError
+	}
 	return response, nil
 }
 
@@ -406,7 +430,7 @@ func (s *authService) Login(ctx context.Context, payload LoginPayload) (LoginRes
 		UserID: user.ID.String(),
 		Email:  user.Email,
 		Name:   user.Name,
-		Dp:     user.Dp.String,
+		Dp:     user.Dp,
 	})
 
 	if err != nil {
@@ -742,19 +766,19 @@ func (s *authService) ChangePassword(ctx context.Context, initiator string, payl
 	return response, nil
 }
 
-func (s *authService) Profile(ctx context.Context, initiator string, payload ProfilePayload) (ProfileResponse, error) {
-	var response ProfileResponse
-	user, err := s.repository.FindUserById(ctx, uuid.MustParse(initiator))
-	if err != nil {
-		logger.Error().Err(err).Msg("failed to find user by id")
-		return response, UserNotFoundErr
-	}
-	response = ProfileResponse{
-		HumanID: user.HumanID,
-		Email:   user.Email,
-		Name:    user.Name,
-		Dp:      user.Dp.String,
-		Phone:   user.Phone,
-	}
-	return response, nil
-}
+// func (s *authService) Profile(ctx context.Context, initiator string, payload ProfilePayload) (ProfileResponse, error) {
+// 	var response ProfileResponse
+// 	user, err := s.repository.FindUserById(ctx, uuid.MustParse(initiator))
+// 	if err != nil {
+// 		logger.Error().Err(err).Msg("failed to find user by id")
+// 		return response, UserNotFoundErr
+// 	}
+// 	response = ProfileResponse{
+// 		HumanID: user.HumanID,
+// 		Email:   user.Email,
+// 		Name:    user.Name,
+// 		Dp:      user.Dp,
+// 		Phone:   user.Phone,
+// 	}
+// 	return response, nil
+// }

@@ -5,19 +5,24 @@ import (
 
 	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/dao"
 	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/database"
+	"github.com/aritradevelops/billbharat/backend/shared/notification"
+	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type FindTemplateParams struct {
-	Event    dao.EventType   `bson:"event" json:"event"`
-	Channel  dao.ChannelType `bson:"channel" json:"channel"`
-	Locale   string          `bson:"locale" json:"locale"`
-	Scope    string          `bson:"scope" json:"scope"`
-	Mimetype string          `bson:"mimetype" json:"mimetype"`
+	Event    notification.NotificationEvent `bson:"event" json:"event"`
+	Channel  notification.ChannelType       `bson:"channel" json:"channel"`
+	Locale   string                         `bson:"locale" json:"locale"`
+	Scope    string                         `bson:"scope" json:"scope"`
+	Mimetype string                         `bson:"mimetype" json:"mimetype"`
 }
 
 type Repository interface {
-	CreateTemplate(ctx context.Context, template *dao.Template) (*dao.Template, error)
-	FindTemplate(ctx context.Context, params FindTemplateParams) (*dao.Template, error)
+	CreateTemplate(ctx context.Context, template dao.Template) (dao.Template, error)
+	FindTemplate(ctx context.Context, params FindTemplateParams) (dao.Template, error)
+	SyncUser(ctx context.Context, user dao.User) error
 }
 
 type repository struct {
@@ -31,24 +36,33 @@ func NewRepository(db database.Database) Repository {
 }
 
 // CreateTemplate implements Repository.
-func (r *repository) CreateTemplate(ctx context.Context, template *dao.Template) (*dao.Template, error) {
+func (r *repository) CreateTemplate(ctx context.Context, template dao.Template) (dao.Template, error) {
 	collection := r.db.Collection("templates")
 	result, err := collection.InsertOne(ctx, template)
 	if err != nil {
-		return nil, err
+		return dao.Template{}, err
 	}
-	template.ID = result.InsertedID.(string)
+	template.ID = result.InsertedID.(uuid.UUID)
 	return template, nil
 }
 
-func (r *repository) FindTemplate(ctx context.Context, params FindTemplateParams) (*dao.Template, error) {
+func (r *repository) FindTemplate(ctx context.Context, params FindTemplateParams) (dao.Template, error) {
 	collection := r.db.Collection("templates")
 
 	var template dao.Template
 	err := collection.FindOne(ctx, params).Decode(&template)
 
 	if err != nil {
-		return nil, err
+		return dao.Template{}, err
 	}
-	return &template, nil
+	return template, nil
+}
+
+func (r *repository) SyncUser(ctx context.Context, user dao.User) error {
+	collection := r.db.Collection("users")
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": user}, options.UpdateOne().SetUpsert(true))
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -2,13 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/aritradevelops/billbharat/backend/notification/internal/config"
 	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/dao"
 	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/database"
 	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/repository"
+	"github.com/aritradevelops/billbharat/backend/shared/events"
 	"github.com/aritradevelops/billbharat/backend/shared/logger"
+	"github.com/aritradevelops/billbharat/backend/shared/notification"
 )
 
 func main() {
@@ -25,26 +30,52 @@ func main() {
 	}
 	defer db.Disconnect()
 
-	var repo repository.Repository
+	repo := repository.NewRepository(db)
 
-	if conf.Deployment.Env == "local" {
-		repo = repository.NewFilesystemRepository()
-	} else {
-		repo = repository.NewRepository(db)
-	}
-
-	temp, err := repo.FindTemplate(context.Background(), repository.FindTemplateParams{
-		Event:    dao.USER_SIGNUP_OTP,
-		Channel:  dao.EMAIL,
-		Locale:   "en",
-		Scope:    "default",
-		Mimetype: "text/html",
+	eventManager := events.NewKafkaEventManager(events.KafkaOpts{
+		Servers: conf.EventBroker.Servers,
+		GroupId: conf.EventBroker.GroupID,
 	})
-	if err != nil {
-		logger.Error().Err(err).Msg("failed to find template")
-		return
-	}
-	logger.Info().Interface("template", temp).Msg("template found")
-	fmt.Println(temp.Body)
+	ctx, stop := signal.NotifyContext(
+		context.Background(),
+		os.Interrupt,
+		syscall.SIGTERM,
+	)
+	defer stop()
 
+	go eventManager.OnManageUserEvent(ctx, func(payload events.EventPayload[events.ManageUserEventPayload]) error {
+		logger.Info().Interface("payload", payload).Msg("manage user event received")
+		err := repo.SyncUser(ctx, dao.User(payload.Data))
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to sync user")
+		}
+		return nil
+	})
+
+	go eventManager.OnManageNotificationEvent(ctx, func(payload events.EventPayload[events.MangageNotificationEventPayload]) error {
+		logger.Info().Interface("payload", payload).Msg("manage notification event received")
+
+		for _, channel := range payload.Data.Channels {
+			switch channel.Type {
+			case notification.EMAIL:
+				var emailChannel notification.EmailChannel
+
+				dbByte, _ := json.Marshal(channel.Data)
+				err := json.Unmarshal(dbByte, &emailChannel)
+				if err != nil {
+					logger.Error().Err(err).Msg("failed to unmarshal email channel")
+					return err
+				}
+				err = emailChannel.Send()
+				if err != nil {
+					logger.Error().Err(err).Msg("failed to send email")
+					return err
+				}
+			}
+		}
+		return nil
+	})
+
+	<-ctx.Done()
+	logger.Info().Msg("shutting down")
 }

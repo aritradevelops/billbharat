@@ -5,9 +5,9 @@ import (
 
 	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/dao"
 	"github.com/aritradevelops/billbharat/backend/auth/internal/persistence/repository"
+	"github.com/aritradevelops/billbharat/backend/shared/events"
 	"github.com/aritradevelops/billbharat/backend/shared/logger"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type UserService interface {
@@ -20,24 +20,25 @@ type ProfilePayload struct {
 }
 
 type UpdateDPPayload struct {
-	ID string `json:"id"`
-	Dp string `json:"dp"`
+	ID string  `json:"id"`
+	Dp *string `json:"dp"`
 }
 
 type ProfileResponse struct {
-	HumanID string `json:"human_id"`
-	Email   string `json:"email"`
-	Name    string `json:"name"`
-	Dp      string `json:"dp"`
-	Phone   string `json:"phone"`
+	HumanID string  `json:"human_id"`
+	Email   string  `json:"email"`
+	Name    string  `json:"name"`
+	Dp      *string `json:"dp"`
+	Phone   string  `json:"phone"`
 }
 
 type userService struct {
-	repository repository.Repository
+	repository   repository.Repository
+	eventManager events.EventManager
 }
 
-func NewUserService(repository repository.Repository) UserService {
-	return &userService{repository: repository}
+func NewUserService(repository repository.Repository, eventManager events.EventManager) UserService {
+	return &userService{repository: repository, eventManager: eventManager}
 }
 
 func (s *userService) Profile(ctx context.Context, initiator string, payload ProfilePayload) (ProfileResponse, error) {
@@ -54,7 +55,7 @@ func (s *userService) Profile(ctx context.Context, initiator string, payload Pro
 		HumanID: user.HumanID,
 		Email:   user.Email,
 		Name:    user.Name,
-		Dp:      user.Dp.String,
+		Dp:      user.Dp,
 		Phone:   user.Phone,
 	}
 	return response, nil
@@ -68,20 +69,22 @@ func (s *userService) UpdateDP(ctx context.Context, initiator string, payload Up
 
 	user, err := s.repository.UpdateUserDP(ctx, dao.UpdateUserDPParams{
 		ID: uuid.MustParse(payload.ID),
-		Dp: pgtype.Text{
-			String: payload.Dp,
-			Valid:  true,
-		},
+		Dp: payload.Dp,
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to update user dp")
 		return response, UserNotFoundErr
 	}
+	err = s.eventManager.EmitManageUserEvent(ctx, events.NewUserManageEvent("update", events.ManageUserEventPayload(user)))
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to emit manage user event")
+		return response, InternalError
+	}
 	response = ProfileResponse{
 		HumanID: user.HumanID,
 		Email:   user.Email,
 		Name:    user.Name,
-		Dp:      payload.Dp,
+		Dp:      user.Dp,
 		Phone:   user.Phone,
 	}
 	return response, nil

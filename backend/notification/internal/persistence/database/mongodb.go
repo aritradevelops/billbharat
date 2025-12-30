@@ -47,6 +47,7 @@ func (m *MongoDB) Connect() error {
 	if dbName == "/" {
 		return fmt.Errorf("database name not found in connection string")
 	}
+	m.dbName = dbName
 
 	opts := options.Client().ApplyURI(m.connString)
 	client, err := mongo.Connect(opts)

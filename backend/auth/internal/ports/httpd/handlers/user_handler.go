@@ -12,7 +12,7 @@ type UserHandler struct {
 }
 
 type UpdateDPPayload struct {
-	Dp string `form:"dp"`
+	Dp *string `json:"dp"`
 }
 
 func NewUserHandler(userSrv service.UserService) *UserHandler {

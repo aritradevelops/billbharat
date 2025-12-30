@@ -7,10 +7,10 @@ import (
 )
 
 type JwtPayload struct {
-	UserID string `json:"user_id"`
-	Email  string `json:"email"`
-	Name   string `json:"name"`
-	Dp     string `json:"dp"`
+	UserID string  `json:"user_id"`
+	Email  string  `json:"email"`
+	Name   string  `json:"name"`
+	Dp     *string `json:"dp"`
 }
 type claims struct {
 	JwtPayload

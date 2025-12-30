@@ -1,4 +1,4 @@
-package repository
+package templatestore
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"path"
 
 	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/dao"
+	"github.com/aritradevelops/billbharat/backend/shared/notification"
 	"github.com/google/uuid"
 )
 
@@ -33,14 +34,22 @@ func PreferredExt(mimeType string) string {
 
 // this is only for running in local
 // and storing the templates in filesystem
-type FilesystemRepository struct {
+type FSTemplateStore struct {
 	fs embed.FS
 }
 
-func NewFilesystemRepository() Repository {
-	return &FilesystemRepository{
+func NewFSTemplateStore() TemplateStorage {
+	return &FSTemplateStore{
 		fs: templateFs,
 	}
+}
+
+type FindTemplateParams struct {
+	Event    notification.NotificationEvent `bson:"event" json:"event"`
+	Channel  notification.ChannelType       `bson:"channel" json:"channel"`
+	Locale   string                         `bson:"locale" json:"locale"`
+	Scope    string                         `bson:"scope" json:"scope"`
+	Mimetype string                         `bson:"mimetype" json:"mimetype"`
 }
 
 // NOTE: scope is not considered in the path, for local filesystem
@@ -62,24 +71,24 @@ func (t FindTemplateParams) metadataPath() string {
 }
 
 // CreateTemplate implements Repository.
-func (f *FilesystemRepository) CreateTemplate(ctx context.Context, template *dao.Template) (*dao.Template, error) {
-	return nil, fmt.Errorf("not supported")
+func (f *FSTemplateStore) CreateTemplate(ctx context.Context, template dao.Template) (dao.Template, error) {
+	return dao.Template{}, fmt.Errorf("not supported")
 }
 
-func (f *FilesystemRepository) FindTemplate(ctx context.Context, params FindTemplateParams) (*dao.Template, error) {
+func (f *FSTemplateStore) FindTemplate(ctx context.Context, params FindTemplateParams) (dao.Template, error) {
 	contentPath, err := params.contentPath()
 	if err != nil {
-		return nil, err
+		return dao.Template{}, err
 	}
 	content, err := f.fs.ReadFile(contentPath)
 	if err != nil {
-		return nil, err
+		return dao.Template{}, err
 	}
 
 	metadataPath := params.metadataPath()
 	metadataBytes, err := f.fs.ReadFile(metadataPath)
 	if err != nil {
-		return nil, err
+		return dao.Template{}, err
 	}
 
 	metadata := struct {
@@ -88,12 +97,11 @@ func (f *FilesystemRepository) FindTemplate(ctx context.Context, params FindTemp
 
 	err = json.Unmarshal(metadataBytes, &metadata)
 	if err != nil {
-		return nil, err
+		return dao.Template{}, err
 	}
 
-	return &dao.Template{
-		ID:       params.directory(),
-		UID:      uuid.New(),
+	return dao.Template{
+		ID:       uuid.New(),
 		Event:    params.Event,
 		Channel:  params.Channel,
 		Locale:   params.Locale,

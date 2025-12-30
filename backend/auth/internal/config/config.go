@@ -51,6 +51,7 @@ type Jwt struct {
 
 type EventBroker struct {
 	Servers []string `env:"SERVERS,required" envSeparator:","`
+	GroupID string   `env:"GROUP_ID,required"`
 }
 
 func Load() (Config, error) {
