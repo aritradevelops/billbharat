@@ -45,12 +45,28 @@ func (k *Kafka) EmitManageNotificationEvent(ctx context.Context, data EventPaylo
 	return k.produce(ctx, ManageNotification, data)
 }
 
+func (k *Kafka) EmitManageBusinessEvent(ctx context.Context, data EventPayload[MangageBusinessEventPayload]) error {
+	return k.produce(ctx, ManageBusinessEvent, data)
+}
+
+func (k *Kafka) EmitManageBusinessUserEvent(ctx context.Context, data EventPayload[MangageBusinessUserEventPayload]) error {
+	return k.produce(ctx, ManageBusinessUserEvent, data)
+}
+
 func (k *Kafka) OnManageUserEvent(ctx context.Context, handler func(EventPayload[ManageUserEventPayload]) error) {
 	go startKafkaConsumer(ctx, k.newReader(ManageUserEvent), handler)
 }
 
 func (k *Kafka) OnManageNotificationEvent(ctx context.Context, handler func(EventPayload[MangageNotificationEventPayload]) error) {
 	go startKafkaConsumer(ctx, k.newReader(ManageNotification), handler)
+}
+
+func (k *Kafka) OnManageBusinessEvent(ctx context.Context, handler func(EventPayload[MangageBusinessEventPayload]) error) {
+	go startKafkaConsumer(ctx, k.newReader(ManageBusinessEvent), handler)
+}
+
+func (k *Kafka) OnManageBusinessUserEvent(ctx context.Context, handler func(EventPayload[MangageBusinessUserEventPayload]) error) {
+	go startKafkaConsumer(ctx, k.newReader(ManageBusinessUserEvent), handler)
 }
 
 func (k *Kafka) newReader(e Event) *kafka.Reader {

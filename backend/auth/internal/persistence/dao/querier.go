@@ -12,23 +12,33 @@ import (
 
 type Querier interface {
 	ActivateUser(ctx context.Context, arg ActivateUserParams) (User, error)
+	CreateBusiness(ctx context.Context, arg CreateBusinessParams) (Business, error)
+	CreateBusinessUser(ctx context.Context, arg CreateBusinessUserParams) (BusinessUser, error)
 	CreatePassword(ctx context.Context, arg CreatePasswordParams) error
 	CreateSession(ctx context.Context, arg CreateSessionParams) error
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateVerificationRequest(ctx context.Context, arg CreateVerificationRequestParams) error
 	DeactivateUser(ctx context.Context, arg DeactivateUserParams) (User, error)
+	DeleteBusiness(ctx context.Context, id uuid.UUID) (Business, error)
+	DeleteBusinessUser(ctx context.Context, arg DeleteBusinessUserParams) (BusinessUser, error)
 	DeletePassword(ctx context.Context, arg DeletePasswordParams) (int64, error)
 	DeleteSession(ctx context.Context, id uuid.UUID) error
 	DeleteUser(ctx context.Context, arg DeleteUserParams) (User, error)
+	FindBusinessById(ctx context.Context, id uuid.UUID) (Business, error)
+	FindBusinessByOwner(ctx context.Context, ownerID uuid.UUID) (Business, error)
+	FindBusinessesByUserID(ctx context.Context, userID uuid.UUID) ([]FindBusinessesByUserIDRow, error)
 	FindLastFourPasswordsByUserId(ctx context.Context, userID uuid.UUID) ([]Password, error)
 	FindPasswordByUserId(ctx context.Context, userID uuid.UUID) (Password, error)
 	FindSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error)
 	FindUserByEmail(ctx context.Context, email string) (User, error)
 	FindUserById(ctx context.Context, id uuid.UUID) (User, error)
+	FindUsersByBusinessID(ctx context.Context, businessID uuid.UUID) ([]FindUsersByBusinessIDRow, error)
 	FindVerificationRequestByUserIdAndType(ctx context.Context, arg FindVerificationRequestByUserIdAndTypeParams) (VerificationRequest, error)
+	SetBusinessLogo(ctx context.Context, arg SetBusinessLogoParams) (Business, error)
 	SetUserEmailVerified(ctx context.Context, id uuid.UUID) (User, error)
 	SetUserPhoneVerified(ctx context.Context, id uuid.UUID) (User, error)
 	SetVerificationRequestConsumedAt(ctx context.Context, id uuid.UUID) error
+	UpdateBusiness(ctx context.Context, arg UpdateBusinessParams) (Business, error)
 	UpdateUserDP(ctx context.Context, arg UpdateUserDPParams) (User, error)
 }
 
