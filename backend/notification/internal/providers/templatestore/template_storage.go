@@ -12,7 +12,7 @@ type TemplateStorage interface {
 	FindTemplate(ctx context.Context, params FindTemplateParams) (dao.Template, error)
 }
 
-func NewTemplateStore(env string, repo repository.Repository) TemplateStorage {
+func New(env string, repo repository.Repository) TemplateStorage {
 	if env == "production" {
 		return NewDbTemplateStore(repo)
 	}

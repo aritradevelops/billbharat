@@ -227,7 +227,7 @@ func (s *authService) Register(ctx context.Context, payload RegisterPayload) (Re
 		return response, err
 	}
 
-	otp, err := cryptoutil.GenerateOTP()
+	emailOtp, err := cryptoutil.GenerateOTP()
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to generate otp for email")
 		return response, err
@@ -235,12 +235,12 @@ func (s *authService) Register(ctx context.Context, payload RegisterPayload) (Re
 
 	err = repo.CreateVerificationRequest(ctx, dao.CreateVerificationRequestParams{
 		UserID:    user.ID,
-		Code:      otp,
+		Code:      emailOtp,
 		Type:      dao.VerificationTypeEmail,
 		ExpiresAt: time.Now().Add(VerificationRequestExpiry),
 		CreatedBy: user.ID,
 	})
-	otp, err = cryptoutil.GenerateOTP()
+	phoneOtp, err := cryptoutil.GenerateOTP()
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to generate otp for phone")
 		return response, err
@@ -248,7 +248,7 @@ func (s *authService) Register(ctx context.Context, payload RegisterPayload) (Re
 
 	err = repo.CreateVerificationRequest(ctx, dao.CreateVerificationRequestParams{
 		UserID:    user.ID,
-		Code:      otp,
+		Code:      phoneOtp,
 		Type:      dao.VerificationTypePhone,
 		ExpiresAt: time.Now().Add(VerificationRequestExpiry),
 		CreatedBy: user.ID,
@@ -264,7 +264,12 @@ func (s *authService) Register(ctx context.Context, payload RegisterPayload) (Re
 		return response, err
 	}
 
-	s.eventManager.EmitManageUserEvent(ctx, events.NewUserManageEvent("create", events.ManageUserEventPayload(user)))
+	err = s.eventManager.EmitManageUserEvent(ctx, events.NewUserManageEvent("create", events.ManageUserEventPayload(user)))
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to emit manage user event")
+		return response, err
+	}
+
 	response.ID = user.ID
 	response.Name = user.Name
 	response.Email = user.Email
@@ -317,11 +322,12 @@ func (s *authService) VerifyEmail(ctx context.Context, payload VerifyEmailPayloa
 		return response, InternalError
 	}
 	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.MangageNotificationEventPayload{
-		Event: notification.EmailVerifiedEvent,
-		Channels: []notification.Channel[any]{
+		Event: notification.EMAIL_VERIFIED,
+		Kind:  notification.P2P,
+		Payload: []events.NotificationChannelPayload{
 			{
-				Type: notification.EMAIL,
-				Data: notification.NewEmailChannel([]string{user.Email}, []string{}, []string{}, notification.P2P),
+				Channel: notification.EMAIL,
+				Data:    notification.NewEmail(user.Email),
 			},
 		},
 	}))
@@ -462,7 +468,6 @@ func (s *authService) Login(ctx context.Context, payload LoginPayload) (LoginRes
 	return response, nil
 }
 
-// TODO: send otp to email
 func (s *authService) SendEmailVerificationRequest(ctx context.Context, payload SendEmailVerificationRequestPayload) (SendEmailVerificationRequestResponse, error) {
 	var response SendEmailVerificationRequestResponse
 	errs := validation.Validate(payload)
@@ -510,11 +515,30 @@ func (s *authService) SendEmailVerificationRequest(ctx context.Context, payload 
 		logger.Error().Err(err).Msg("failed to create verification request")
 		return response, InternalError
 	}
+	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.MangageNotificationEventPayload{
+		Event: notification.EMAIL_VERIFICATION,
+		Kind:  notification.P2P,
+		Payload: []events.NotificationChannelPayload{
+			{
+				Channel: notification.EMAIL,
+				Data:    notification.NewEmail(user.Email),
+			},
+		},
+		Tokens: map[string]string{
+			"Name":       user.Name,
+			"Email":      user.Email,
+			"Otp":        otp,
+			"Expires_In": VerificationRequestExpiry.String(),
+		},
+	}))
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to emit manage notification event")
+		return response, err
+	}
 
 	return response, nil
 }
 
-// TODO: send otp to phone
 func (s *authService) SendPhoneVerificationRequest(ctx context.Context, payload SendPhoneVerificationRequestPayload) (SendPhoneVerificationRequestResponse, error) {
 	var response SendPhoneVerificationRequestResponse
 	errs := validation.Validate(payload)
@@ -561,6 +585,26 @@ func (s *authService) SendPhoneVerificationRequest(ctx context.Context, payload 
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create verification request")
 		return response, InternalError
+	}
+	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.MangageNotificationEventPayload{
+		Event: notification.PHONE_VERIFICATION,
+		Kind:  notification.P2P,
+		Payload: []events.NotificationChannelPayload{
+			{
+				Channel: notification.SMS,
+				Data:    notification.NewSMS(user.Phone),
+			},
+		},
+		Tokens: map[string]string{
+			"Name":       user.Name,
+			"Phone":      user.Phone,
+			"Otp":        otp,
+			"Expires_In": VerificationRequestExpiry.String(),
+		},
+	}))
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to emit manage notification event")
+		return response, err
 	}
 
 	return response, nil

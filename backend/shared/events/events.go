@@ -3,7 +3,6 @@ package events
 import (
 	"time"
 
-	"github.com/aritradevelops/billbharat/backend/shared/notification"
 	"github.com/google/uuid"
 )
 
@@ -52,13 +51,4 @@ type ManageUserEventPayload struct {
 	DeactivatedBy *uuid.UUID `json:"deactivated_by"`
 	DeletedAt     *time.Time `json:"deleted_at"`
 	DeletedBy     *uuid.UUID `json:"deleted_by"`
-}
-
-type MangageNotificationEventPayload struct {
-	Event    notification.NotificationEvent `json:"event"`
-	Channels []notification.Channel[any]    `json:"channels"`
-}
-
-func NewNotificationManageEvent(data MangageNotificationEventPayload) EventPayload[MangageNotificationEventPayload] {
-	return newEvent(ManageNotification, "send", data)
 }

@@ -32,6 +32,7 @@ func NewKafkaEventManager(opts KafkaOpts) EventManager {
 			Dialer: &kafka.Dialer{
 				Timeout: 10 * time.Second,
 			},
+			Async: true,
 		}),
 	}
 }

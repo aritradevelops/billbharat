@@ -1,0 +1,14 @@
+Hi {{.Name}},
+
+Thanks for starting your registration with BillBharat. We want to make sure it's really you. Please enter the following One-Time Password (OTP) to verify your phone number:
+
+{{.Otp}}
+
+This code will expire in {{.Expires_In}}.
+
+If you didn't request this verification, you can safely ignore this message.
+
+Thanks,
+The BillBharat Team
+
+© 2024 BillBharat. All rights reserved.

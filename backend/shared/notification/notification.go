@@ -1,40 +1,60 @@
 package notification
 
-type EventType string
+type Event string
 
 const (
-	P2P       EventType = "p2p"
-	Broadcast EventType = "broadcast"
+	SIGNUP             Event = "signup"
+	EMAIL_VERIFICATION Event = "email_verification"
+	EMAIL_VERIFIED     Event = "email_verified"
+	PHONE_VERIFICATION Event = "phone_verification"
+	PHONE_VERIFIED     Event = "phone_verified"
+	FORGOT_PASSWORD    Event = "forgot_password"
+	RESET_PASSWORD     Event = "reset_password"
+	CHANGE_PASSWORD    Event = "change_password"
 )
 
-type ChannelType string
+type Channel string
 
 const (
-	EMAIL ChannelType = "email"
-	SMS   ChannelType = "sms"
-	PUSH  ChannelType = "push"
+	EMAIL    Channel = "email"
+	SMS      Channel = "sms"
+	PUSH     Channel = "push"
+	WHATSAPP Channel = "whatsapp"
 )
 
-type Channel[Data any] struct {
-	Type ChannelType `json:"type,omitempty"`
-	Data Data        `json:"data,omitempty"`
+type Kind string
+
+const (
+	P2P       Kind = "p2p"
+	BROADCAST Kind = "broadcast"
+)
+
+func NewSMS(to ...string) *SMSData {
+	return &SMSData{
+		To: to,
+	}
 }
 
-type NotificationEvent string
+type SMSData struct {
+	To []string `json:"to"`
+}
 
-const (
-	SignupNotificationEvent NotificationEvent = "signup"
-	EmailVerificationEvent  NotificationEvent = "email_verification"
-	EmailVerifiedEvent      NotificationEvent = "email_verified"
-	PhoneVerificationEvent  NotificationEvent = "phone_verification"
-	PhoneVerifiedEvent      NotificationEvent = "phone_verified"
-	ForgotPasswordEvent     NotificationEvent = "forgot_password"
-	ResetPasswordEvent      NotificationEvent = "reset_password"
-	ChangePasswordEvent     NotificationEvent = "change_password"
-)
+func NewPushMessage(to ...string) *PushMessageData {
+	return &PushMessageData{
+		To: to,
+	}
+}
 
-type Notification struct {
-	Event    NotificationEvent `json:"event"`
-	Channels []Channel[any]    `json:"channels"`
-	Data     any               `json:"data"`
+type PushMessageData struct {
+	To []string `json:"to"`
+}
+
+type WhatsappMessageData struct {
+	To []string `json:"to"`
+}
+
+func NewWhatsappMessage(to ...string) *WhatsappMessageData {
+	return &WhatsappMessageData{
+		To: to,
+	}
 }

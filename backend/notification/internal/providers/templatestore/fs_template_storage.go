@@ -45,11 +45,11 @@ func NewFSTemplateStore() TemplateStorage {
 }
 
 type FindTemplateParams struct {
-	Event    notification.NotificationEvent `bson:"event" json:"event"`
-	Channel  notification.ChannelType       `bson:"channel" json:"channel"`
-	Locale   string                         `bson:"locale" json:"locale"`
-	Scope    string                         `bson:"scope" json:"scope"`
-	Mimetype string                         `bson:"mimetype" json:"mimetype"`
+	Event    notification.Event   `bson:"event" json:"event"`
+	Channel  notification.Channel `bson:"channel" json:"channel"`
+	Locale   string               `bson:"locale" json:"locale"`
+	Scope    string               `bson:"scope" json:"scope"`
+	Mimetype string               `bson:"mimetype" json:"mimetype"`
 }
 
 // NOTE: scope is not considered in the path, for local filesystem

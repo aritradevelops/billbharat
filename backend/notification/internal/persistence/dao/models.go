@@ -8,13 +8,13 @@ import (
 )
 
 type Template struct {
-	ID       uuid.UUID                      `bson:"_id" json:"id"`
-	Event    notification.NotificationEvent `bson:"event" json:"event"`
-	Channel  notification.ChannelType       `bson:"channel" json:"channel"`
-	Locale   string                         `bson:"locale" json:"locale"`
-	Subject  string                         `bson:"subject" json:"subject"`
-	Body     string                         `bson:"body" json:"body"`
-	Mimetype string                         `bson:"mimetype" json:"mimetype"`
+	ID       uuid.UUID            `bson:"_id" json:"id"`
+	Event    notification.Event   `bson:"event" json:"event"`
+	Channel  notification.Channel `bson:"channel" json:"channel"`
+	Locale   string               `bson:"locale" json:"locale"`
+	Subject  string               `bson:"subject" json:"subject"`
+	Body     string               `bson:"body" json:"body"`
+	Mimetype string               `bson:"mimetype" json:"mimetype"`
 	// scope can be default or some custom target like for a business the business id
 	Scope string `bson:"scope" json:"scope"`
 	// we don't need version as of now
