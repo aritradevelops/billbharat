@@ -1,0 +1,14 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  infra:
+    dir: ./infrastructure
+    taskfile: ./infrastructure/Taskfile.yml
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+
