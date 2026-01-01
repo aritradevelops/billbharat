@@ -28,6 +28,7 @@ auth:
   register: "User registered successfully."
   login: "User logged in successfully."
   verify_email: "Email verified successfully."
+  verify_phone: "Phone verified successfully."
   forgot_password: "Password reset email sent successfully."
   reset_password: "Password reset successfully."
   change_password: "Password changed successfully."

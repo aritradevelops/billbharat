@@ -1,5 +1,5 @@
 CREATE TABLE "businesses" (
-    id uuid PRIMARY KEY,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name varchar(255) NOT NULL,
     description text,
     logo text,

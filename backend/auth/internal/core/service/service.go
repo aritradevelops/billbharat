@@ -7,13 +7,15 @@ import (
 )
 
 type Service struct {
-	Auth AuthService
-	User UserService
+	Auth     AuthService
+	User     UserService
+	Business BusinessService
 }
 
 func New(repository repository.Repository, jwtManager *jwtutil.JwtManager, eventManger events.EventManager) *Service {
 	return &Service{
-		Auth: NewAuthService(repository, jwtManager, eventManger),
-		User: NewUserService(repository, eventManger),
+		Auth:     NewAuthService(repository, jwtManager, eventManger),
+		User:     NewUserService(repository, eventManger),
+		Business: NewBusinessService(repository, eventManger),
 	}
 }

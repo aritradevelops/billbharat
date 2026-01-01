@@ -12,16 +12,15 @@ import (
 )
 
 type BusinessService interface {
-	CreateBusiness(ctx context.Context, initiator string, payload CreateBusinessPayload) (CreateBusinessResponse, error)
+	Create(ctx context.Context, initiator string, payload CreateBusinessPayload) (CreateBusinessResponse, error)
 }
 
 type CreateBusinessPayload struct {
 	Name            string   `json:"name" validate:"required,min=3,max=255"`
-	Description     *string  `json:"description" validate:"min=50,max=255"`
-	Logo            *string  `json:"logo" validate:"url"`
-	Industry        string   `json:"industry" validate:"required,oneof=IT,Healthcare,Education,Finance,Manufacturing,Retail,Travel,Entertainment,Other"`
+	Description     *string  `json:"description" validate:"omitempty,min=50,max=255"`
+	Logo            *string  `json:"logo" validate:"omitempty,url"`
+	Industry        string   `json:"industry" validate:"required,oneof=IT Healthcare Education Finance Manufacturing Retail Travel Entertainment Other"`
 	PrimaryCurrency string   `json:"primary_currency" validate:"required"`
-	OwnerID         string   `json:"owner_id" validate:"required"`
 	Currencies      []string `json:"currencies" validate:"required"`
 }
 
@@ -45,7 +44,7 @@ func NewBusinessService(repository repository.Repository, eventManager events.Ev
 	return &businessService{repository: repository, eventManager: eventManager}
 }
 
-func (s *businessService) CreateBusiness(ctx context.Context, initiator string, payload CreateBusinessPayload) (CreateBusinessResponse, error) {
+func (s *businessService) Create(ctx context.Context, initiator string, payload CreateBusinessPayload) (CreateBusinessResponse, error) {
 	var response CreateBusinessResponse
 	errs := validation.Validate(payload)
 	if errs != nil {
@@ -65,13 +64,13 @@ func (s *businessService) CreateBusiness(ctx context.Context, initiator string, 
 		Logo:            payload.Logo,
 		Industry:        payload.Industry,
 		PrimaryCurrency: payload.PrimaryCurrency,
-		OwnerID:         uuid.MustParse(payload.OwnerID),
+		OwnerID:         uuid.MustParse(initiator),
 		Currencies:      payload.Currencies,
 		CreatedBy:       uuid.MustParse(initiator),
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create business")
-		return response, InternalError
+		return response, err
 	}
 
 	businessUser, err := repo.CreateBusinessUser(ctx, dao.CreateBusinessUserParams{
@@ -83,7 +82,7 @@ func (s *businessService) CreateBusiness(ctx context.Context, initiator string, 
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create business user")
-		return response, InternalError
+		return response, err
 	}
 
 	err = s.eventManager.EmitManageBusinessEvent(ctx, events.NewBusinessManageEvent("create", events.MangageBusinessEventPayload(business)))

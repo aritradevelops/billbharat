@@ -6,15 +6,17 @@ import (
 )
 
 type Handler struct {
-	db   database.Database
-	Auth *AuthHandler
-	User *UserHandler
+	db       database.Database
+	Auth     *AuthHandler
+	User     *UserHandler
+	Business *BusinessHandler
 }
 
 func New(db database.Database, service *service.Service) *Handler {
 	return &Handler{
-		db:   db,
-		Auth: NewAuthHandler(service.Auth),
-		User: NewUserHandler(service.User),
+		db:       db,
+		Auth:     NewAuthHandler(service.Auth),
+		User:     NewUserHandler(service.User),
+		Business: NewBusinessHandler(service.Business),
 	}
 }

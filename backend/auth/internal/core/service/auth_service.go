@@ -227,38 +227,6 @@ func (s *authService) Register(ctx context.Context, payload RegisterPayload) (Re
 		return response, err
 	}
 
-	emailOtp, err := cryptoutil.GenerateOTP()
-	if err != nil {
-		logger.Error().Err(err).Msg("failed to generate otp for email")
-		return response, err
-	}
-
-	err = repo.CreateVerificationRequest(ctx, dao.CreateVerificationRequestParams{
-		UserID:    user.ID,
-		Code:      emailOtp,
-		Type:      dao.VerificationTypeEmail,
-		ExpiresAt: time.Now().Add(VerificationRequestExpiry),
-		CreatedBy: user.ID,
-	})
-	phoneOtp, err := cryptoutil.GenerateOTP()
-	if err != nil {
-		logger.Error().Err(err).Msg("failed to generate otp for phone")
-		return response, err
-	}
-
-	err = repo.CreateVerificationRequest(ctx, dao.CreateVerificationRequestParams{
-		UserID:    user.ID,
-		Code:      phoneOtp,
-		Type:      dao.VerificationTypePhone,
-		ExpiresAt: time.Now().Add(VerificationRequestExpiry),
-		CreatedBy: user.ID,
-	})
-
-	if err != nil {
-		logger.Error().Err(err).Msg("failed to create verification request")
-		return response, err
-	}
-
 	if err := tx.Commit(ctx); err != nil {
 		logger.Error().Err(err).Msg("failed to commit transaction")
 		return response, err

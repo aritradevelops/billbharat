@@ -10,6 +10,6 @@ env "local" {
   # The schema.sql file to compare against
   dev = "docker://postgres/15/dev" # ephemeral dev db atlas uses for analysis
 
-  # atlas migrate diff user_and_sessions --env local --to "file://internal/persistence/schemas"
+  # atlas migrate diff business_and_users --env local --to "file://internal/persistence/schemas"
   # atlas migrate apply --env local
 }

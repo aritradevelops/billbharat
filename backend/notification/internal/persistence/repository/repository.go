@@ -23,6 +23,8 @@ type Repository interface {
 	CreateTemplate(ctx context.Context, template dao.Template) (dao.Template, error)
 	FindTemplate(ctx context.Context, params FindTemplateParams) (dao.Template, error)
 	SyncUser(ctx context.Context, user dao.User) error
+	SyncBusiness(ctx context.Context, business dao.Business) error
+	SyncBusinessUser(ctx context.Context, businessUser dao.BusinessUser) error
 }
 
 type repository struct {
@@ -61,6 +63,24 @@ func (r *repository) FindTemplate(ctx context.Context, params FindTemplateParams
 func (r *repository) SyncUser(ctx context.Context, user dao.User) error {
 	collection := r.db.Collection("users")
 	_, err := collection.UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": user}, options.UpdateOne().SetUpsert(true))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repository) SyncBusiness(ctx context.Context, business dao.Business) error {
+	collection := r.db.Collection("businesses")
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": business.ID}, bson.M{"$set": business}, options.UpdateOne().SetUpsert(true))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repository) SyncBusinessUser(ctx context.Context, businessUser dao.BusinessUser) error {
+	collection := r.db.Collection("business_users")
+	_, err := collection.UpdateOne(ctx, bson.M{"user_id": businessUser.UserID, "business_id": businessUser.BusinessID}, bson.M{"$set": businessUser}, options.UpdateOne().SetUpsert(true))
 	if err != nil {
 		return err
 	}

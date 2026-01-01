@@ -45,3 +45,31 @@ type User struct {
 	DeletedAt     *time.Time `bson:"deleted_at" json:"deleted_at"`
 	DeletedBy     *uuid.UUID `bson:"deleted_by" json:"deleted_by"`
 }
+
+type Business struct {
+	ID              uuid.UUID  `bson:"_id" json:"id"`
+	Name            string     `json:"name"`
+	Description     *string    `json:"description"`
+	Logo            *string    `json:"logo"`
+	Industry        string     `json:"industry"`
+	PrimaryCurrency string     `json:"primary_currency"`
+	OwnerID         uuid.UUID  `json:"owner_id"`
+	Currencies      []string   `json:"currencies"`
+	CreatedAt       time.Time  `json:"created_at"`
+	CreatedBy       uuid.UUID  `json:"created_by"`
+	UpdatedAt       time.Time  `json:"updated_at"`
+	UpdatedBy       *uuid.UUID `json:"updated_by"`
+	DeletedAt       *time.Time `json:"deleted_at"`
+	DeletedBy       *uuid.UUID `json:"deleted_by"`
+}
+type BusinessUser struct {
+	UserID     uuid.UUID  `bson:"user_id" json:"user_id"`
+	BusinessID uuid.UUID  `bson:"business_id" json:"business_id"`
+	Role       string     `bson:"role" json:"role"`
+	CreatedAt  time.Time  `bson:"created_at" json:"created_at"`
+	CreatedBy  uuid.UUID  `bson:"created_by" json:"created_by"`
+	UpdatedAt  time.Time  `bson:"updated_at" json:"updated_at"`
+	UpdatedBy  *uuid.UUID `bson:"updated_by" json:"updated_by"`
+	DeletedAt  *time.Time `bson:"deleted_at" json:"deleted_at"`
+	DeletedBy  *uuid.UUID `bson:"deleted_by" json:"deleted_by"`
+}
