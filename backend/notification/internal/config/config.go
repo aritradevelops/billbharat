@@ -17,6 +17,7 @@ type Config struct {
 	Deployment  Deployment  `envPrefix:"DEPLOYMENT_"`
 	Jwt         Jwt         `envPrefix:"JWT_"`
 	EventBroker EventBroker `envPrefix:"EVENT_BROKER_"`
+	Mailer      Mailer      `envPrefix:"MAILER_"`
 }
 
 type Http struct {
@@ -45,6 +46,16 @@ type Jwt struct {
 type EventBroker struct {
 	Servers []string `env:"SERVERS,required" envSeparator:","`
 	GroupID string   `env:"GROUP_ID,required"`
+}
+
+type Mailer struct {
+	Domain   string `env:"DOMAIN,required"`
+	Host     string `env:"HOST,required"`
+	Port     int    `env:"PORT,required"`
+	Username string `env:"USERNAME,required"`
+	Password string `env:"PASSWORD,required"`
+	From     string `env:"FROM,required"`
+	FromName string `env:"FROM_NAME,required"`
 }
 
 func Load() (Config, error) {

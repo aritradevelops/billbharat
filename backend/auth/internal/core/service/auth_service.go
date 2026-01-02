@@ -113,6 +113,7 @@ type LoginResponse struct {
 	RefreshToken         string    `json:"refresh_token"`
 	AccessTokenLifetime  time.Time `json:"access_token_lifetime"`
 	RefreshTokenLifetime time.Time `json:"refresh_token_lifetime"`
+	BusinessFound        bool      `json:"business_found"`
 }
 
 type SendEmailVerificationRequestPayload struct {
@@ -289,7 +290,7 @@ func (s *authService) VerifyEmail(ctx context.Context, payload VerifyEmailPayloa
 		logger.Error().Err(err).Msg("failed to emit manage user event")
 		return response, InternalError
 	}
-	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.MangageNotificationEventPayload{
+	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.ManageNotificationEventPayload{
 		Event: notification.EMAIL_VERIFIED,
 		Kind:  notification.P2P,
 		Payload: []events.NotificationChannelPayload{
@@ -400,11 +401,24 @@ func (s *authService) Login(ctx context.Context, payload LoginPayload) (LoginRes
 		return response, InvalidCredentialsErr
 	}
 
+	business, err := s.repository.FindBusinessesByUserID(ctx, user.ID)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to find business")
+		return response, InternalError
+	}
+	var businessID string
+	// if user has exactly one business, issue token for that business
+	if len(business) == 1 {
+		businessID = business[0].Business.ID.String()
+		response.BusinessFound = true
+	}
+
 	accessToken, err := s.jwtManager.Sign(jwtutil.JwtPayload{
-		UserID: user.ID.String(),
-		Email:  user.Email,
-		Name:   user.Name,
-		Dp:     user.Dp,
+		UserID:     user.ID.String(),
+		Email:      user.Email,
+		Name:       user.Name,
+		Dp:         user.Dp,
+		BusinessID: businessID,
 	})
 
 	if err != nil {
@@ -483,7 +497,7 @@ func (s *authService) SendEmailVerificationRequest(ctx context.Context, payload 
 		logger.Error().Err(err).Msg("failed to create verification request")
 		return response, InternalError
 	}
-	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.MangageNotificationEventPayload{
+	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.ManageNotificationEventPayload{
 		Event: notification.EMAIL_VERIFICATION,
 		Kind:  notification.P2P,
 		Payload: []events.NotificationChannelPayload{
@@ -554,7 +568,7 @@ func (s *authService) SendPhoneVerificationRequest(ctx context.Context, payload 
 		logger.Error().Err(err).Msg("failed to create verification request")
 		return response, InternalError
 	}
-	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.MangageNotificationEventPayload{
+	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.ManageNotificationEventPayload{
 		Event: notification.PHONE_VERIFICATION,
 		Kind:  notification.P2P,
 		Payload: []events.NotificationChannelPayload{

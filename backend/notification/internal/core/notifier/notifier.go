@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"text/template"
 
+	"github.com/aritradevelops/billbharat/backend/notification/internal/config"
 	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/repository"
 	"github.com/aritradevelops/billbharat/backend/notification/internal/providers/mailer"
 	"github.com/aritradevelops/billbharat/backend/notification/internal/providers/smsprovider"
@@ -16,7 +17,7 @@ import (
 )
 
 type Notifier interface {
-	Notify(ctx context.Context, payload events.EventPayload[events.MangageNotificationEventPayload]) error
+	Notify(ctx context.Context, payload events.EventPayload[events.ManageNotificationEventPayload]) error
 }
 
 type NotifierImpl struct {
@@ -26,16 +27,16 @@ type NotifierImpl struct {
 	templateStore templatestore.TemplateStorage
 }
 
-func New(ctx context.Context, env string, repo repository.Repository) Notifier {
+func New(ctx context.Context, env string, repo repository.Repository, config config.Mailer) Notifier {
 	return &NotifierImpl{
 		ctx:           ctx,
-		mailer:        mailer.New(env),
+		mailer:        mailer.New(env, config),
 		smsProvider:   smsprovider.New(env),
 		templateStore: templatestore.New(env, repo),
 	}
 }
 
-func (n *NotifierImpl) Notify(ctx context.Context, payload events.EventPayload[events.MangageNotificationEventPayload]) error {
+func (n *NotifierImpl) Notify(ctx context.Context, payload events.EventPayload[events.ManageNotificationEventPayload]) error {
 	for _, msg := range payload.Data.Payload {
 		switch msg.Channel {
 		case notification.EMAIL:

@@ -34,7 +34,7 @@ func (c *Consumer) Start() {
 	c.eventManager.OnManageBusinessUserEvent(c.ctx, c.handleBusinessUserEvent)
 }
 
-func (c *Consumer) handleNotificationEvent(payload events.EventPayload[events.MangageNotificationEventPayload]) error {
+func (c *Consumer) handleNotificationEvent(payload events.EventPayload[events.ManageNotificationEventPayload]) error {
 	logger.Info().Interface("payload", payload).Msg("manage notification event received")
 	ctx, cancel := context.WithTimeout(c.ctx, time.Second*10)
 	defer cancel()
@@ -43,6 +43,7 @@ func (c *Consumer) handleNotificationEvent(payload events.EventPayload[events.Ma
 		logger.Error().Err(err).Msg("failed to notify")
 		return err
 	}
+	logger.Info().Msg("notifications sent successfully")
 	return nil
 }
 
@@ -55,6 +56,7 @@ func (c *Consumer) handleUserEvent(payload events.EventPayload[events.ManageUser
 		logger.Error().Err(err).Msg("failed to sync user")
 		return err
 	}
+	logger.Info().Msg("user synced successfully")
 	return nil
 }
 
@@ -67,6 +69,7 @@ func (c *Consumer) handleBusinessEvent(payload events.EventPayload[events.Mangag
 		logger.Error().Err(err).Msg("failed to sync business")
 		return err
 	}
+	logger.Info().Msg("business synced successfully")
 	return nil
 }
 
@@ -79,5 +82,6 @@ func (c *Consumer) handleBusinessUserEvent(payload events.EventPayload[events.Ma
 		logger.Error().Err(err).Msg("failed to sync business user")
 		return err
 	}
+	logger.Info().Msg("business user synced successfully")
 	return nil
 }

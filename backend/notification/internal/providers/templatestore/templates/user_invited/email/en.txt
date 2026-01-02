@@ -1,0 +1,17 @@
+You've been invited to join {{.BusinessName}}
+
+Hi {{.Name}},
+
+You have been invited to join {{.BusinessName}} on BillBharat.
+
+To accept the invitation, please copy and paste the following link into your browser:
+{{.InvitationURL}}
+
+This invitation will expire on {{.ExpiresAt}}.
+
+If you have questions, reply to this email or contact support.
+
+Thanks,
+The BillBharat Team
+
+© 2024 BillBharat. All rights reserved.

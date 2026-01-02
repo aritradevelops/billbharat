@@ -14,6 +14,7 @@ type Querier interface {
 	ActivateUser(ctx context.Context, arg ActivateUserParams) (User, error)
 	CreateBusiness(ctx context.Context, arg CreateBusinessParams) (Business, error)
 	CreateBusinessUser(ctx context.Context, arg CreateBusinessUserParams) (BusinessUser, error)
+	CreateInvitation(ctx context.Context, arg CreateInvitationParams) (Invitation, error)
 	CreatePassword(ctx context.Context, arg CreatePasswordParams) error
 	CreateSession(ctx context.Context, arg CreateSessionParams) error
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
@@ -27,6 +28,7 @@ type Querier interface {
 	FindBusinessById(ctx context.Context, id uuid.UUID) (Business, error)
 	FindBusinessByOwner(ctx context.Context, ownerID uuid.UUID) (Business, error)
 	FindBusinessesByUserID(ctx context.Context, userID uuid.UUID) ([]FindBusinessesByUserIDRow, error)
+	FindInvitationByHashAndBusinessID(ctx context.Context, arg FindInvitationByHashAndBusinessIDParams) (Invitation, error)
 	FindLastFourPasswordsByUserId(ctx context.Context, userID uuid.UUID) ([]Password, error)
 	FindPasswordByUserId(ctx context.Context, userID uuid.UUID) (Password, error)
 	FindSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error)
@@ -35,6 +37,7 @@ type Querier interface {
 	FindUsersByBusinessID(ctx context.Context, businessID uuid.UUID) ([]FindUsersByBusinessIDRow, error)
 	FindVerificationRequestByUserIdAndType(ctx context.Context, arg FindVerificationRequestByUserIdAndTypeParams) (VerificationRequest, error)
 	SetBusinessLogo(ctx context.Context, arg SetBusinessLogoParams) (Business, error)
+	SetInvitationAcceptedAt(ctx context.Context, id uuid.UUID) error
 	SetUserEmailVerified(ctx context.Context, id uuid.UUID) (User, error)
 	SetUserPhoneVerified(ctx context.Context, id uuid.UUID) (User, error)
 	SetVerificationRequestConsumedAt(ctx context.Context, id uuid.UUID) error

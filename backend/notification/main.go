@@ -41,7 +41,7 @@ func main() {
 		syscall.SIGTERM,
 	)
 	defer stop()
-	notifier := notifier.New(ctx, conf.Deployment.Env, repo)
+	notifier := notifier.New(ctx, conf.Deployment.Env, repo, conf.Mailer)
 	consumer := consumer.New(ctx, eventManager, repo, notifier)
 	consumer.Start()
 

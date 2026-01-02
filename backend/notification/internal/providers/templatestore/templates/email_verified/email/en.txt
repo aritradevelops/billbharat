@@ -1,0 +1,12 @@
+Email Verified
+
+Hi {{.Name}},
+
+Your email address has been successfully verified.
+
+You can now access all features of your BillBharat account.
+
+Thanks,
+The BillBharat Team
+
+© 2024 BillBharat. All rights reserved.

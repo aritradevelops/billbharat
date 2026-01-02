@@ -44,6 +44,7 @@ user:
   email_verified: "Email is already verified."
   phone_verified: "Phone is already verified."
   update_dp: "Profile picture updated successfully."
+  invite: "User invited successfully."
 verification_request:
   expired: "Verification request expired."
   invalid_code: "Invalid verification code."

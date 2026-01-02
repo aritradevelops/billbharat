@@ -41,7 +41,7 @@ func (k *Kafka) EmitManageUserEvent(ctx context.Context, data EventPayload[Manag
 	return k.produce(ctx, ManageUserEvent, data)
 }
 
-func (k *Kafka) EmitManageNotificationEvent(ctx context.Context, data EventPayload[MangageNotificationEventPayload]) error {
+func (k *Kafka) EmitManageNotificationEvent(ctx context.Context, data EventPayload[ManageNotificationEventPayload]) error {
 	return k.produce(ctx, ManageNotification, data)
 }
 
@@ -57,7 +57,7 @@ func (k *Kafka) OnManageUserEvent(ctx context.Context, handler func(EventPayload
 	go startKafkaConsumer(ctx, k.newReader(ManageUserEvent), handler)
 }
 
-func (k *Kafka) OnManageNotificationEvent(ctx context.Context, handler func(EventPayload[MangageNotificationEventPayload]) error) {
+func (k *Kafka) OnManageNotificationEvent(ctx context.Context, handler func(EventPayload[ManageNotificationEventPayload]) error) {
 	go startKafkaConsumer(ctx, k.newReader(ManageNotification), handler)
 }
 
@@ -84,10 +84,16 @@ func (k *Kafka) produce(ctx context.Context, event Event, data any) error {
 	if err != nil {
 		return err
 	}
-	return k.writer.WriteMessages(ctx, kafka.Message{
+	err = k.writer.WriteMessages(ctx, kafka.Message{
 		Topic: string(event),
 		Value: dataBytes,
 	})
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to write message")
+		return err
+	}
+	logger.Info().Str("event", string(event)).Interface("data", data).Msg("message written successfully.")
+	return nil
 }
 
 func startKafkaConsumer[T any](
@@ -95,7 +101,10 @@ func startKafkaConsumer[T any](
 	reader *kafka.Reader,
 	handler func(T) error,
 ) {
-	defer reader.Close()
+	defer func() {
+		reader.Close()
+		logger.Info().Msg("reader closed")
+	}()
 	for {
 		msg, err := reader.FetchMessage(ctx)
 		if err != nil {
@@ -119,6 +128,8 @@ func startKafkaConsumer[T any](
 
 		if err := reader.CommitMessages(ctx, msg); err != nil {
 			logger.Error().Err(err).Msg("commit failed")
+		} else {
+			logger.Info().Msg("message committed successfully.")
 		}
 	}
 }

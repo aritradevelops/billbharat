@@ -1,0 +1,12 @@
+Phone Verified
+
+Hi {{.Name}},
+
+Your phone number has been successfully verified.
+
+You can now access all features of your BillBharat account.
+
+Thanks,
+The BillBharat Team
+
+© 2024 BillBharat. All rights reserved.

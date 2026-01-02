@@ -11,6 +11,7 @@ const (
 	FORGOT_PASSWORD    Event = "forgot_password"
 	RESET_PASSWORD     Event = "reset_password"
 	CHANGE_PASSWORD    Event = "change_password"
+	USER_INVITED       Event = "user_invited"
 )
 
 type Channel string

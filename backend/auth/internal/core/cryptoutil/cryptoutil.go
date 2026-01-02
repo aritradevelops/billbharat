@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	OTP_LENGTH           = 6
-	REFRESH_TOKEN_LENGTH = 64
+	OTP_LENGTH              = 6
+	REFRESH_TOKEN_LENGTH    = 64
+	INVITATION_TOKEN_LENGTH = 64
 )
 
 func HumanID(prefix string) string {
@@ -43,4 +44,8 @@ func generateHash(length int) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(secretBytes), nil
+}
+
+func GenerateInvitationHash() (string, error) {
+	return generateHash(INVITATION_TOKEN_LENGTH)
 }

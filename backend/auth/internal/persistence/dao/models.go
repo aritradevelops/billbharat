@@ -96,6 +96,23 @@ type BusinessUser struct {
 	DeletedBy  *uuid.UUID `json:"deleted_by"`
 }
 
+type Invitation struct {
+	ID         uuid.UUID  `json:"id"`
+	Name       string     `json:"name"`
+	Email      string     `json:"email"`
+	Phone      string     `json:"phone"`
+	BusinessID uuid.UUID  `json:"business_id"`
+	Hash       string     `json:"hash"`
+	ExpiresAt  time.Time  `json:"expires_at"`
+	AcceptedAt *time.Time `json:"accepted_at"`
+	CreatedAt  time.Time  `json:"created_at"`
+	CreatedBy  uuid.UUID  `json:"created_by"`
+	UpdatedAt  *time.Time `json:"updated_at"`
+	UpdatedBy  *uuid.UUID `json:"updated_by"`
+	DeletedAt  *time.Time `json:"deleted_at"`
+	DeletedBy  *uuid.UUID `json:"deleted_by"`
+}
+
 type Password struct {
 	ID        uuid.UUID  `json:"id"`
 	UserID    uuid.UUID  `json:"user_id"`

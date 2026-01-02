@@ -2,7 +2,7 @@ package events
 
 import "github.com/aritradevelops/billbharat/backend/shared/notification"
 
-type MangageNotificationEventPayload struct {
+type ManageNotificationEventPayload struct {
 	Event   notification.Event           `json:"event"`
 	Kind    notification.Kind            `json:"kind"`
 	Payload []NotificationChannelPayload `json:"payload"`
@@ -14,6 +14,6 @@ type NotificationChannelPayload struct {
 	Data    any                  `json:"data"`
 }
 
-func NewNotificationManageEvent(data MangageNotificationEventPayload) EventPayload[MangageNotificationEventPayload] {
+func NewNotificationManageEvent(data ManageNotificationEventPayload) EventPayload[ManageNotificationEventPayload] {
 	return newEvent(ManageNotification, "send", data)
 }
