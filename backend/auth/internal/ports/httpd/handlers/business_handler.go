@@ -32,3 +32,45 @@ func (h *BusinessHandler) Create(c *fiber.Ctx) error {
 	}
 	return c.JSON(NewResponse(translation.Localize(c, "controller.create", fiber.Map{"Entity": "Business"}), resp, nil))
 }
+
+func (h *BusinessHandler) List(c *fiber.Ctx) error {
+	user, err := authn.GetUserFromContext(c)
+	if err != nil {
+		return err
+	}
+	resp, err := h.businessSrv.List(c.Context(), user.UserID)
+	if err != nil {
+		return err
+	}
+	return c.JSON(NewResponse(translation.Localize(c, "controller.list", fiber.Map{"Entity": "Business"}), resp, nil))
+}
+
+func (h *BusinessHandler) Select(c *fiber.Ctx) error {
+	user, err := authn.GetUserFromContext(c)
+	if err != nil {
+		return err
+	}
+	response, err := h.businessSrv.Select(c.Context(), user.UserID, c.Params("business_id"), service.SwitchBusinessPayload{
+		UserIP:    c.IP(),
+		UserAgent: c.Get("User-Agent"),
+	})
+	if err != nil {
+		return err
+	}
+	c.Cookie(&fiber.Cookie{
+		Name:     "access_token",
+		Value:    response.AccessToken,
+		Path:     "/",
+		HTTPOnly: true,
+		Expires:  response.AccessTokenLifetime,
+	})
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    response.RefreshToken,
+		Path:     "/",
+		HTTPOnly: true,
+		Expires:  response.RefreshTokenLifetime,
+	})
+	return c.JSON(NewResponse(translation.Localize(c, "auth.login"), response, nil))
+}

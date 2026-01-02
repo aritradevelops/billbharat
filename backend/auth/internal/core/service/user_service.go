@@ -117,6 +117,10 @@ func (s *userService) Invite(ctx context.Context, initiator string, businessId s
 		return response, err
 	}
 
+	if businessId == "" {
+		return response, InvalidBusinessIdErr
+	}
+
 	invitationHash, err := cryptoutil.GenerateInvitationHash()
 
 	if err != nil {
@@ -146,7 +150,7 @@ func (s *userService) Invite(ctx context.Context, initiator string, businessId s
 				{Channel: notification.SMS, Data: notification.NewSMS(invitation.Phone)},
 			},
 			Tokens: map[string]string{
-				"InvitationURL": fmt.Sprintf("%s/invites/%s", payload.Origin, invitationHash),
+				"InvitationURL": fmt.Sprintf("https://%s/invites/%s", payload.Origin, invitationHash),
 				"Email":         invitation.Email,
 				"Name":          invitation.Name,
 				"Phone":         invitation.Phone,

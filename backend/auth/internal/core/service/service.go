@@ -16,6 +16,6 @@ func New(repository repository.Repository, jwtManager *jwtutil.JwtManager, event
 	return &Service{
 		Auth:     NewAuthService(repository, jwtManager, eventManger),
 		User:     NewUserService(repository, eventManger),
-		Business: NewBusinessService(repository, eventManger),
+		Business: NewBusinessService(repository, eventManger, jwtManager),
 	}
 }

@@ -299,6 +299,7 @@ func (s *authService) VerifyEmail(ctx context.Context, payload VerifyEmailPayloa
 				Data:    notification.NewEmail(user.Email),
 			},
 		},
+		Tokens: user,
 	}))
 
 	if err != nil {
@@ -353,6 +354,24 @@ func (s *authService) VerifyPhone(ctx context.Context, payload VerifyPhonePayloa
 		logger.Error().Err(err).Msg("failed to emit manage user event")
 		return response, InternalError
 	}
+
+	err = s.eventManager.EmitManageNotificationEvent(ctx, events.NewNotificationManageEvent(events.ManageNotificationEventPayload{
+		Event: notification.PHONE_VERIFIED,
+		Kind:  notification.P2P,
+		Payload: []events.NotificationChannelPayload{
+			{
+				Channel: notification.SMS,
+				Data:    notification.NewSMS(user.Phone),
+			},
+		},
+		Tokens: user,
+	}))
+
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to emit manage notification event")
+		return response, InternalError
+	}
+
 	return response, nil
 }
 
@@ -432,7 +451,7 @@ func (s *authService) Login(ctx context.Context, payload LoginPayload) (LoginRes
 		return response, InternalError
 	}
 
-	s.repository.CreateSession(ctx, dao.CreateSessionParams{
+	err = s.repository.CreateSession(ctx, dao.CreateSessionParams{
 		HumanID:      cryptoutil.HumanID("session"),
 		UserID:       user.ID,
 		UserIp:       payload.UserIP,
@@ -441,6 +460,11 @@ func (s *authService) Login(ctx context.Context, payload LoginPayload) (LoginRes
 		ExpiresAt:    time.Now().Add(SessionExpiry),
 		CreatedBy:    user.ID,
 	})
+
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to create session")
+		return response, InternalError
+	}
 
 	response.AccessToken = accessToken.Token
 	response.AccessTokenLifetime = accessToken.Lifetime
