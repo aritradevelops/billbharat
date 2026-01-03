@@ -151,7 +151,9 @@ func (s *businessService) Create(ctx context.Context, initiator string, payload 
 }
 
 func (s *businessService) List(ctx context.Context, initiator string) (ListBusinessesResponse, error) {
-	var response ListBusinessesResponse
+	response := ListBusinessesResponse{
+		Businesses: []ListBusinessesResponseBusiness{},
+	}
 	businesses, err := s.repository.FindBusinessesByUserID(ctx, uuid.MustParse(initiator))
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to find businesses by user id")

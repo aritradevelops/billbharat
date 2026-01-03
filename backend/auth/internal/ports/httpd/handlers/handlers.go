@@ -12,11 +12,11 @@ type Handler struct {
 	Business *BusinessHandler
 }
 
-func New(db database.Database, service *service.Service) *Handler {
+func New(db database.Database, service *service.Service, environment string) *Handler {
 	return &Handler{
 		db:       db,
-		Auth:     NewAuthHandler(service.Auth),
+		Auth:     NewAuthHandler(service.Auth, environment),
 		User:     NewUserHandler(service.User),
-		Business: NewBusinessHandler(service.Business),
+		Business: NewBusinessHandler(service.Business, environment),
 	}
 }

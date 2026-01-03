@@ -43,7 +43,7 @@ func main() {
 
 	srv := service.New(repo, jwtManager, eventManager)
 
-	handler := handlers.New(db, srv)
+	handler := handlers.New(db, srv, conf.Deployment.Env)
 
 	server := httpd.NewServer(conf.Http.Host, conf.Http.Port, handler, jwtManager)
 	server.SetupRoutes()

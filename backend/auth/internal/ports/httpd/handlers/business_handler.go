@@ -9,11 +9,13 @@ import (
 
 type BusinessHandler struct {
 	businessSrv service.BusinessService
+	environment string
 }
 
-func NewBusinessHandler(businessSrv service.BusinessService) *BusinessHandler {
+func NewBusinessHandler(businessSrv service.BusinessService, environment string) *BusinessHandler {
 	return &BusinessHandler{
 		businessSrv: businessSrv,
+		environment: environment,
 	}
 }
 
@@ -57,12 +59,22 @@ func (h *BusinessHandler) Select(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
+	cookieSameSite := fiber.CookieSameSiteLaxMode
+	secure := true
+	if h.environment != "production" {
+		cookieSameSite = fiber.CookieSameSiteStrictMode
+		secure = false
+	}
+
 	c.Cookie(&fiber.Cookie{
 		Name:     "access_token",
 		Value:    response.AccessToken,
 		Path:     "/",
 		HTTPOnly: true,
 		Expires:  response.AccessTokenLifetime,
+		SameSite: cookieSameSite,
+		Secure:   secure,
 	})
 
 	c.Cookie(&fiber.Cookie{
@@ -71,6 +83,8 @@ func (h *BusinessHandler) Select(c *fiber.Ctx) error {
 		Path:     "/",
 		HTTPOnly: true,
 		Expires:  response.RefreshTokenLifetime,
+		SameSite: cookieSameSite,
+		Secure:   secure,
 	})
 	return c.JSON(NewResponse(translation.Localize(c, "auth.login"), response, nil))
 }

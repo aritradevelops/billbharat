@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/aritradevelops/billbharat/backend/auth/internal/core/jwtutil"
+	"github.com/aritradevelops/billbharat/backend/shared/logger"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -13,17 +14,21 @@ const authUserKey = "auth_user"
 func Middleware(jwtManager *jwtutil.JwtManager) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		bearer := c.Get("Authorization")
-		if bearer == "" {
-			bearer = c.Cookies("access_token")
+		accessToken := strings.TrimPrefix(bearer, "Bearer ")
+		if accessToken == "" {
+			accessToken = c.Cookies("access_token")
+			logger.Info().Msg("Access token not found in header")
 		}
-		if bearer == "" {
+		if accessToken == "" {
+			logger.Info().Msg("Access token not found in cookies")
 			return fiber.ErrUnauthorized
 		}
-		accessToken := strings.TrimPrefix(bearer, "Bearer ")
 		payload, err := jwtManager.Verify(accessToken)
+		logger.Error().Err(err).Msg("Access token verification failed")
 		if err != nil {
 			return fiber.ErrUnauthorized
 		}
+		logger.Info().Msg("Access token verified successfully")
 		c.Locals(authUserKey, payload)
 		return c.Next()
 	}

@@ -37,12 +37,10 @@ export default function BusinessSelectPage() {
 
         if (response.ok) {
           const data = await response.json()
-          setBusinesses(data || [])
+          setBusinesses(data.businesses || [])
         } else {
           // Handle error, maybe token expired
           if (response.status === 401) {
-            Cookies.remove("access_token")
-            Cookies.remove("refresh_token")
             router.push("/login")
           }
           console.error("Failed to fetch businesses")
@@ -68,10 +66,6 @@ export default function BusinessSelectPage() {
 
       if (response.ok) {
         const data = await response.json()
-        // Update token if the backend returns a new one scoped to the business
-        if (data.access_token) {
-          Cookies.set("access_token", data.access_token)
-        }
         toast.success("Business selected")
         router.push("/") // Redirect to dashboard
       } else {

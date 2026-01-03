@@ -9,11 +9,13 @@ import (
 
 type AuthHandler struct {
 	authService service.AuthService
+	environment string
 }
 
-func NewAuthHandler(authService service.AuthService) *AuthHandler {
+func NewAuthHandler(authService service.AuthService, environment string) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
+		environment: environment,
 	}
 }
 
@@ -127,26 +129,29 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		return err
 	}
 
+	cookieSameSite := fiber.CookieSameSiteLaxMode
+	secure := true
+	if h.environment != "production" {
+		cookieSameSite = fiber.CookieSameSiteStrictMode
+		secure = false
+	}
+
 	c.Cookie(&fiber.Cookie{
 		Name:     "access_token",
 		Value:    response.AccessToken,
-		Path:     "/",
 		HTTPOnly: true,
 		Expires:  response.AccessTokenLifetime,
-		Secure:   false,
-		MaxAge:   360000,
-		SameSite: fiber.CookieSameSiteLaxMode,
+		SameSite: cookieSameSite,
+		Secure:   secure,
 	})
 
 	c.Cookie(&fiber.Cookie{
 		Name:     "refresh_token",
 		Value:    response.RefreshToken,
-		Path:     "/",
 		HTTPOnly: true,
 		Expires:  response.RefreshTokenLifetime,
-		Secure:   false,
-		MaxAge:   360000,
-		SameSite: fiber.CookieSameSiteLaxMode,
+		SameSite: cookieSameSite,
+		Secure:   secure,
 	})
 
 	return c.JSON(NewResponse(translation.Localize(c, "auth.login", nil), response, nil))

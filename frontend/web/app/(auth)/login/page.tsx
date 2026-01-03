@@ -52,23 +52,10 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     setIsLoading(true)
     try {
-      // Fetch User IP
-      let userIp = "127.0.0.1" // Fallback
-      try {
-        const ipRes = await fetch("https://api.ipify.org?format=json")
-        if (ipRes.ok) {
-          const ipData = await ipRes.json()
-          userIp = ipData.ip
-        }
-      } catch (e) {
-        console.warn("Failed to fetch IP", e)
-      }
 
       const payload = {
         email: values.email,
         password: values.password,
-        user_ip: userIp,
-        user_agent: navigator.userAgent,
       }
 
       const response = await fetch(`${API_BASE_url}/auth/login`, {
@@ -77,6 +64,7 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
+        credentials: "include",
       })
 
       const data = await response.json()
