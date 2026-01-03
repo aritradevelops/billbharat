@@ -7,6 +7,7 @@ import (
 	"github.com/aritradevelops/billbharat/backend/auth/internal/ports/httpd/handlers"
 	"github.com/aritradevelops/billbharat/backend/shared/translation"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
@@ -23,6 +24,10 @@ func NewServer(host string, port int, handlers *handlers.Handler, jwtManager *jw
 	app := fiber.New(fiber.Config{
 		ErrorHandler: ErrorHandler(),
 	})
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3000",
+		AllowCredentials: true,
+	}))
 	app.Use(recover.New(
 		recover.Config{
 			EnableStackTrace: true,

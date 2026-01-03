@@ -133,6 +133,9 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		Path:     "/",
 		HTTPOnly: true,
 		Expires:  response.AccessTokenLifetime,
+		Secure:   false,
+		MaxAge:   360000,
+		SameSite: fiber.CookieSameSiteLaxMode,
 	})
 
 	c.Cookie(&fiber.Cookie{
@@ -141,6 +144,9 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		Path:     "/",
 		HTTPOnly: true,
 		Expires:  response.RefreshTokenLifetime,
+		Secure:   false,
+		MaxAge:   360000,
+		SameSite: fiber.CookieSameSiteLaxMode,
 	})
 
 	return c.JSON(NewResponse(translation.Localize(c, "auth.login", nil), response, nil))
