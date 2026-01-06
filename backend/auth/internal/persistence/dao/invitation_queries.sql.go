@@ -14,16 +14,17 @@ import (
 
 const createInvitation = `-- name: CreateInvitation :one
 INSERT INTO "invitations" (
-  name, email, phone, business_id, hash, expires_at, created_by
+  name, email, phone, role, business_id, hash, expires_at, created_by
 ) VAlUES (
-  $1,$2,$3,$4,$5,$6,$7
-) RETURNING id, name, email, phone, business_id, hash, expires_at, accepted_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+  $1,$2,$3,$4,$5,$6,$7,$8
+) RETURNING id, name, email, phone, role, business_id, hash, expires_at, accepted_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 `
 
 type CreateInvitationParams struct {
 	Name       string    `json:"name"`
 	Email      string    `json:"email"`
 	Phone      string    `json:"phone"`
+	Role       string    `json:"role"`
 	BusinessID uuid.UUID `json:"business_id"`
 	Hash       string    `json:"hash"`
 	ExpiresAt  time.Time `json:"expires_at"`
@@ -35,6 +36,7 @@ func (q *Queries) CreateInvitation(ctx context.Context, arg CreateInvitationPara
 		arg.Name,
 		arg.Email,
 		arg.Phone,
+		arg.Role,
 		arg.BusinessID,
 		arg.Hash,
 		arg.ExpiresAt,
@@ -46,6 +48,7 @@ func (q *Queries) CreateInvitation(ctx context.Context, arg CreateInvitationPara
 		&i.Name,
 		&i.Email,
 		&i.Phone,
+		&i.Role,
 		&i.BusinessID,
 		&i.Hash,
 		&i.ExpiresAt,
@@ -60,23 +63,19 @@ func (q *Queries) CreateInvitation(ctx context.Context, arg CreateInvitationPara
 	return i, err
 }
 
-const findInvitationByHashAndBusinessID = `-- name: FindInvitationByHashAndBusinessID :one
-SELECT id, name, email, phone, business_id, hash, expires_at, accepted_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM "invitations" WHERE hash = $1 AND business_id = $2 AND expires_at > now() AND deleted_at IS NULL
+const findInvitationByHash = `-- name: FindInvitationByHash :one
+SELECT id, name, email, phone, role, business_id, hash, expires_at, accepted_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM "invitations" WHERE hash = $1 AND expires_at > now() AND deleted_at IS NULL
 `
 
-type FindInvitationByHashAndBusinessIDParams struct {
-	Hash       string    `json:"hash"`
-	BusinessID uuid.UUID `json:"business_id"`
-}
-
-func (q *Queries) FindInvitationByHashAndBusinessID(ctx context.Context, arg FindInvitationByHashAndBusinessIDParams) (Invitation, error) {
-	row := q.db.QueryRow(ctx, findInvitationByHashAndBusinessID, arg.Hash, arg.BusinessID)
+func (q *Queries) FindInvitationByHash(ctx context.Context, hash string) (Invitation, error) {
+	row := q.db.QueryRow(ctx, findInvitationByHash, hash)
 	var i Invitation
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Email,
 		&i.Phone,
+		&i.Role,
 		&i.BusinessID,
 		&i.Hash,
 		&i.ExpiresAt,

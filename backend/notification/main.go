@@ -13,6 +13,7 @@ import (
 	"github.com/aritradevelops/billbharat/backend/notification/internal/persistence/repository"
 	"github.com/aritradevelops/billbharat/backend/shared/events"
 	"github.com/aritradevelops/billbharat/backend/shared/logger"
+	figure "github.com/common-nighthawk/go-figure"
 )
 
 func main() {
@@ -21,6 +22,9 @@ func main() {
 		logger.Error().Err(err).Msg("failed to load config")
 		return
 	}
+
+	figure.NewColorFigure(conf.Service.Name, "", "blue", true).Print()
+
 	db := database.NewMongoDB(conf.Database.Uri)
 
 	if err := db.Connect(); err != nil {

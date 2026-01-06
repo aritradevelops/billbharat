@@ -11,6 +11,7 @@ import (
 	"github.com/aritradevelops/billbharat/backend/auth/internal/ports/httpd"
 	"github.com/aritradevelops/billbharat/backend/auth/internal/ports/httpd/handlers"
 	"github.com/aritradevelops/billbharat/backend/shared/events"
+	"github.com/common-nighthawk/go-figure"
 )
 
 func main() {
@@ -19,6 +20,9 @@ func main() {
 		fmt.Println("failed to load config", err)
 		return
 	}
+
+	logo := figure.NewColorFigure(conf.Service.Name, "", "blue", true)
+	logo.Print()
 
 	db := database.NewPostgres(conf.Database.Uri, conf.Database.Timeout)
 

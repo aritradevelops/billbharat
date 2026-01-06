@@ -19,10 +19,17 @@ const (
 	InvitationLifetime = 15 * 24 * time.Hour // 15 days
 )
 
+var (
+	InvitationNotFoundErr = &ServiceError{
+		HttpErrorCode: 404, DevErrorCode: "user_001", Short: "invitation.not_found", Long: "invitation not found",
+	}
+)
+
 type UserService interface {
 	Profile(ctx context.Context, initiator string, payload ProfilePayload) (ProfileResponse, error)
 	UpdateDP(ctx context.Context, initiator string, payload UpdateDPPayload) (ProfileResponse, error)
 	Invite(ctx context.Context, initiator string, businessId string, payload InvitePayload) (InviteResponse, error)
+	AcceptInvitation(ctx context.Context, initiator string, hash string) (AcceptInvitationResponse, error)
 }
 
 type ProfilePayload struct {
@@ -45,12 +52,16 @@ type ProfileResponse struct {
 type InvitePayload struct {
 	Name        string `json:"name" validate:"min=3,alphaspace,max=255"`
 	Email       string `json:"email" validate:"email"`
+	Role        string `json:"role" validate:"required,oneof=Employee"`
 	CountryCode string `json:"country_code" validate:"required"`
 	Phone       string `json:"phone" validate:"numeric,min=10,max=16"`
 	Origin      string `json:"origin" validate:"required"`
 }
 
 type InviteResponse struct {
+}
+
+type AcceptInvitationResponse struct {
 }
 
 type userService struct {
@@ -131,6 +142,7 @@ func (s *userService) Invite(ctx context.Context, initiator string, businessId s
 		Name:       payload.Name,
 		Email:      payload.Email,
 		Phone:      payload.CountryCode + payload.Phone,
+		Role:       payload.Role,
 		BusinessID: uuid.MustParse(businessId),
 		Hash:       invitationHash,
 		ExpiresAt:  time.Now().Add(InvitationLifetime),
@@ -163,6 +175,61 @@ func (s *userService) Invite(ctx context.Context, initiator string, businessId s
 			logger.Info().Msgf("Failed to send notification to %s", invitation.Name)
 		}
 	}(invitation)
+
+	return response, nil
+}
+
+// get the invitation
+// check if user exists
+// if user does not exists then create user
+// create business user
+// after accepting the invitation user can do forget password to set a password
+func (s *userService) AcceptInvitation(ctx context.Context, initiator string, hash string) (AcceptInvitationResponse, error) {
+	var response AcceptInvitationResponse
+
+	invitation, err := s.repository.FindInvitationByHash(ctx, hash)
+	if err != nil {
+		return response, InvitationNotFoundErr
+	}
+	humanID := cryptoutil.HumanID("user")
+	tx, err := s.repository.StartTransaction(ctx)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to start transaction")
+		return response, err
+	}
+	defer tx.Rollback(ctx)
+	repo := s.repository.WithTx(tx)
+	user, err := s.repository.FindUserByEmail(ctx, invitation.Email)
+	if err != nil {
+		user, err = repo.CreateUser(ctx, dao.CreateUserParams{
+			HumanID:       humanID,
+			Name:          invitation.Name,
+			Email:         invitation.Email,
+			Phone:         invitation.Phone,
+			EmailVerified: true,
+			CreatedBy:     invitation.CreatedBy,
+		})
+		if err != nil {
+			return response, InternalError
+		}
+	}
+
+	_, err = repo.CreateBusinessUser(ctx, dao.CreateBusinessUserParams{
+		BusinessID: invitation.BusinessID,
+		UserID:     user.ID,
+		Role:       invitation.Role,
+		CreatedBy:  invitation.CreatedBy,
+	})
+	if err != nil {
+		return response, InternalError
+	}
+
+	if err = repo.SetInvitationAcceptedAt(ctx, invitation.ID); err != nil {
+		return response, InternalError
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return response, InternalError
+	}
 
 	return response, nil
 }

@@ -1,0 +1,20 @@
+CREATE TABLE "businesses" (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    name varchar(255) NOT NULL,
+    description text,
+    logo text,
+    industry varchar(50) NOT NULL,
+    primary_currency varchar(10) NOT NULL,
+    owner_id uuid NOT NULL,
+    currencies text[] NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by uuid NOT NULL,
+    updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by uuid,
+    deleted_at timestamptz,
+    deleted_by uuid
+    -- FOREIGN KEY (owner_id) REFERENCES "users" (id) ON DELETE CASCADE,
+    -- FOREIGN KEY (created_by) REFERENCES "users" (id) ON DELETE CASCADE,
+    -- FOREIGN KEY (updated_by) REFERENCES "users" (id) ON DELETE CASCADE,
+    -- FOREIGN KEY (deleted_by) REFERENCES "users" (id) ON DELETE CASCADE
+)

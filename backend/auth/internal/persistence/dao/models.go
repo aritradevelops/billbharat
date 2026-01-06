@@ -101,6 +101,7 @@ type Invitation struct {
 	Name       string     `json:"name"`
 	Email      string     `json:"email"`
 	Phone      string     `json:"phone"`
+	Role       string     `json:"role"`
 	BusinessID uuid.UUID  `json:"business_id"`
 	Hash       string     `json:"hash"`
 	ExpiresAt  time.Time  `json:"expires_at"`
@@ -130,6 +131,7 @@ type Session struct {
 	UserAgent    string     `json:"user_agent"`
 	RefreshToken string     `json:"refresh_token"`
 	UserID       uuid.UUID  `json:"user_id"`
+	BusinessID   *uuid.UUID `json:"business_id"`
 	ExpiresAt    time.Time  `json:"expires_at"`
 	CreatedAt    time.Time  `json:"created_at"`
 	CreatedBy    uuid.UUID  `json:"created_by"`

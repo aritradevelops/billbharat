@@ -1,0 +1,53 @@
+# errors
+errors:
+  "400": "Sorry! This request could not be processed!"
+  "401": "You are not authenticated to access this resource!"
+  "403": "You are not authorized to access this resource!"
+  "404": "{{.Resource}} could not be found!"
+  "422": "This request does not satisfy the given constraints!"
+  "500": "Sorry! Something went wrong."
+  "409": "Sorry! This request conflicts with the resource!"
+# controller actions
+controller:
+  list: "{{.Entity}} fetched successfully."
+  create: "{{.Entity}} created successfully."
+  update: "{{.Entity}} updated successfully."
+  view: "{{.Entity}} fetched successfully."
+  delete: "{{.Entity}} deleted successfully."
+# validation messages
+validation:
+  required: "The {{.Field}} is required."
+  min: "The {{.Field}} must be of length {{.Param}} or more."
+  unique: "The {{.Field}} must be unique."
+  email: "The given email is not valid."
+  uppercase: "The {{.Field}} must contain at least {{.Param}} uppercase letter."
+  lowercase: "The {{.Field}} must contain at least {{.Param}} lowercase letter."
+  number: "The {{.Field}} must contain at least {{.Param}} number."
+  special: "The {{.Field}} must contain at least {{.Param}} special character."
+auth:
+  register: "User registered successfully."
+  login: "User logged in successfully."
+  verify_email: "Email verified successfully."
+  verify_phone: "Phone verified successfully."
+  forgot_password: "Password reset email sent successfully."
+  reset_password: "Password reset successfully."
+  change_password: "Password changed successfully."
+  send_phone_verification_request: "Phone verification request sent successfully."
+  send_email_verification_request: "Email verification request sent successfully."
+user:
+  profile: "Profile fetched successfully."
+  exists: "User already exists."
+  not_found: "User not found."
+  deactivated: "User account deactivated."
+  invalid_credentials: "Invalid email or password."
+  invalid_method: "Invalid login method."
+  email_verified: "Email is already verified."
+  phone_verified: "Phone is already verified."
+  update_dp: "Profile picture updated successfully."
+  invite: "User invited successfully."
+  accept_invitation: "User accepted invitation successfully."
+verification_request:
+  expired: "Verification request expired."
+  invalid_code: "Invalid verification code."
+password:
+  already_used: "Password is already used."

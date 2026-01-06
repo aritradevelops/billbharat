@@ -17,9 +17,10 @@ type UpdateDPPayload struct {
 
 type InvitePayload struct {
 	Name        string `json:"name"`
-	Email       string `json:"email" `
+	Email       string `json:"email"`
 	CountryCode string `json:"country_code"`
-	Phone       string `json:"phone" `
+	Phone       string `json:"phone"`
+	Role        string `json:"role"`
 }
 
 func NewUserHandler(userSrv service.UserService) *UserHandler {
@@ -70,6 +71,7 @@ func (h *UserHandler) Invite(c *fiber.Ctx) error {
 		Name:        payload.Name,
 		Email:       payload.Email,
 		CountryCode: payload.CountryCode,
+		Role:        payload.Role,
 		Phone:       payload.Phone,
 		Origin:      c.Get("Origin"),
 	})
@@ -77,4 +79,17 @@ func (h *UserHandler) Invite(c *fiber.Ctx) error {
 		return err
 	}
 	return c.JSON(NewResponse(translation.Localize(c, "user.invite", nil), response, nil))
+}
+
+func (h *UserHandler) AcceptInvitation(c *fiber.Ctx) error {
+	user, err := authn.GetUserFromContext(c)
+	if err != nil {
+		return err
+	}
+	hash := c.Params("hash")
+	response, err := h.userSrv.AcceptInvitation(c.Context(), user.UserID, hash)
+	if err != nil {
+		return err
+	}
+	return c.JSON(NewResponse(translation.Localize(c, "user.accept_invitation", nil), response, nil))
 }

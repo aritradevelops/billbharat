@@ -425,10 +425,10 @@ func (s *authService) Login(ctx context.Context, payload LoginPayload) (LoginRes
 		logger.Error().Err(err).Msg("failed to find business")
 		return response, InternalError
 	}
-	var businessID string
+	var businessID uuid.UUID
 	// if user has exactly one business, issue token for that business
 	if len(business) == 1 {
-		businessID = business[0].Business.ID.String()
+		businessID = business[0].Business.ID
 		response.BusinessFound = true
 	}
 
@@ -437,7 +437,7 @@ func (s *authService) Login(ctx context.Context, payload LoginPayload) (LoginRes
 		Email:      user.Email,
 		Name:       user.Name,
 		Dp:         user.Dp,
-		BusinessID: businessID,
+		BusinessID: businessID.String(),
 	})
 
 	if err != nil {
@@ -456,6 +456,7 @@ func (s *authService) Login(ctx context.Context, payload LoginPayload) (LoginRes
 		UserID:       user.ID,
 		UserIp:       payload.UserIP,
 		UserAgent:    payload.UserAgent,
+		BusinessID:   &businessID,
 		RefreshToken: refreshToken,
 		ExpiresAt:    time.Now().Add(SessionExpiry),
 		CreatedBy:    user.ID,
@@ -559,10 +560,11 @@ func (s *authService) SendPhoneVerificationRequest(ctx context.Context, payload 
 		return response, UserNotFoundErr
 	}
 
-	if user.PhoneVerified {
-		logger.Error().Err(err).Msg("user phone already verified")
-		return response, UserPhoneVerifiedErr
-	}
+	// TODO: reconsider this thing
+	// if user.PhoneVerified {
+	// 	logger.Error().Err(err).Msg("user phone already verified")
+	// 	return response, UserPhoneVerifiedErr
+	// }
 
 	verificationRequest, err := s.repository.FindVerificationRequestByUserIdAndType(ctx, dao.FindVerificationRequestByUserIdAndTypeParams{
 		UserID: user.ID,

@@ -1,8 +1,8 @@
 -- name: CreateSession :exec
 INSERT INTO "sessions" (
-  human_id, user_id, user_ip, user_agent, refresh_token, expires_at, created_by
+  human_id, user_id, user_ip, user_agent, business_id, refresh_token, expires_at, created_by
 ) VALUES (
-   $1, $2, $3, $4, $5, $6, $7
+   $1, $2, $3, $4, $5, $6, $7, $8
 ) RETURNING *;
 
 -- name: FindSessionByRefreshToken :one

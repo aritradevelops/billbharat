@@ -45,9 +45,9 @@ user:
   phone_verified: "Phone is already verified."
   update_dp: "Profile picture updated successfully."
   invite: "User invited successfully."
+  accept_invitation: "User accepted invitation successfully."
 verification_request:
   expired: "Verification request expired."
   invalid_code: "Invalid verification code."
 password:
   already_used: "Password is already used."
-  

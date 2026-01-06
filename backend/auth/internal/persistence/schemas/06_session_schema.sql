@@ -5,6 +5,7 @@ CREATE TABLE "sessions" (
   user_agent VARCHAR(255) NOT NULL,
   refresh_token text NOT NULL UNIQUE,
   user_id uuid NOT NULL,
+  business_id uuid,
   expires_at timestamptz NOT NULL,
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_by uuid NOT NULL,

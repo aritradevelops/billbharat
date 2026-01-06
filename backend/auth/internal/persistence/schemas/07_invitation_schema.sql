@@ -3,6 +3,7 @@ CREATE TABLE "invitations" (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
     business_id uuid NOT NULL,
     hash text NOT NULL,
     expires_at timestamptz NOT NULL,

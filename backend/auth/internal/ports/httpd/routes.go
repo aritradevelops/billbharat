@@ -22,6 +22,7 @@ func (s *Server) SetupRoutes() {
 	router.Get("/api/v1/auth-srv/users/profile/:id", authMiddleware, s.handlers.User.Profile)
 	router.Post("/api/v1/auth-srv/users/change-profile-picture", authMiddleware, s.handlers.User.UpdateDP)
 	router.Post("/api/v1/auth-srv/users/invite", authMiddleware, s.handlers.User.Invite)
+	router.Post("/api/v1/auth-srv/users/accept-invitation/:hash", authMiddleware, s.handlers.User.AcceptInvitation)
 
 	// Business routes
 	router.Post("/api/v1/auth-srv/businesses/create", authMiddleware, s.handlers.Business.Create)

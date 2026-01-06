@@ -209,11 +209,13 @@ func (s *businessService) Select(ctx context.Context, initiator string, business
 		return response, InternalError
 	}
 
+	bUid := uuid.MustParse(businessID)
 	err = s.repository.CreateSession(ctx, dao.CreateSessionParams{
 		HumanID:      cryptoutil.HumanID("session"),
 		UserID:       user.ID,
 		UserIp:       payload.UserIP,
 		UserAgent:    payload.UserAgent,
+		BusinessID:   &bUid,
 		RefreshToken: refreshToken,
 		ExpiresAt:    time.Now().Add(SessionExpiry),
 		CreatedBy:    user.ID,

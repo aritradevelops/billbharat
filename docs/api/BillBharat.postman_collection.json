@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "c1dec7de-e2ef-4e47-949c-4d38af04794b",
+		"_postman_id": "0fc7d9c6-6136-4d1d-8dc8-3dc72f17c48a",
 		"name": "BillBharat",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "49440644",
-		"_collection_link": "https://aritrasadhukhan430-5663509.postman.co/workspace/Aritra-Sadhukhan's-Workspace~6d77a8a3-f4a3-4438-840f-8e2fa81a13ec/collection/49440644-c1dec7de-e2ef-4e47-949c-4d38af04794b?action=share&source=collection_link&creator=49440644"
+		"_exporter_id": "22734359"
 	},
 	"item": [
 		{
@@ -367,6 +366,52 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Accept Invitation",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Origin",
+										"value": "localhost:3000",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Invited User\",\n    \"email\": \"inviteduser@gmail.com\",\n    \"country_code\": \"+91\",\n    \"phone\": \"432009438243\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/v1/auth-srv/users/invite",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"auth-srv",
+										"users",
+										"invite"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -504,6 +549,145 @@
 								"api",
 								"v1",
 								"auth-srv",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product Service",
+			"item": [
+				{
+					"name": "Product Category",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Product Category Two\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/v1/product-srv/product-categories/create",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"product-srv",
+										"product-categories",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Copy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Product Category Two\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/v1/product-srv/product-categories/update/c7464ca6-f411-48c5-b22f-133b0cb72a34",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"product-srv",
+										"product-categories",
+										"update",
+										"c7464ca6-f411-48c5-b22f-133b0cb72a34"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/v1/product-srv/product-categories/list",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"product-srv",
+										"product-categories",
+										"list"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Health",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{user_email}}\",\n    \"password\": \"{{user_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/v1/product-srv/health",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"product-srv",
 								"health"
 							]
 						}

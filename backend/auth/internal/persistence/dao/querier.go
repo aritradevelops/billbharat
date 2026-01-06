@@ -28,7 +28,7 @@ type Querier interface {
 	FindBusinessById(ctx context.Context, id uuid.UUID) (Business, error)
 	FindBusinessByOwner(ctx context.Context, ownerID uuid.UUID) (Business, error)
 	FindBusinessesByUserID(ctx context.Context, userID uuid.UUID) ([]FindBusinessesByUserIDRow, error)
-	FindInvitationByHashAndBusinessID(ctx context.Context, arg FindInvitationByHashAndBusinessIDParams) (Invitation, error)
+	FindInvitationByHash(ctx context.Context, hash string) (Invitation, error)
 	FindLastFourPasswordsByUserId(ctx context.Context, userID uuid.UUID) ([]Password, error)
 	FindPasswordByUserId(ctx context.Context, userID uuid.UUID) (Password, error)
 	FindSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error)

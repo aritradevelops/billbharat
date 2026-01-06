@@ -1,0 +1,48 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema:
+      - "internal/persistence/schemas"
+    queries:
+      - "internal/persistence/queries"
+    gen:
+      go:
+        package: "dao"
+        out: "internal/persistence/dao"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_interface: true
+        emit_all_enum_values: true
+        emit_pointers_for_null_types: true
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+
+          - db_type: "uuid"
+            nullable: true
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+              pointer: true
+          - db_type: "timestamptz"
+            go_type:
+              type: "time.Time"
+
+          - db_type: "timestamptz"
+            nullable: true
+            go_type:
+              type: "*time.Time"
+
+          - db_type: "boolean"
+            go_type:
+              type: "bool"
+
+          - db_type: "boolean"
+            nullable: true
+            go_type:
+              type: "*bool"
+          - db_type: "integer"
+            go_type: "int"
+

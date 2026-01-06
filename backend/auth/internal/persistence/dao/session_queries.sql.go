@@ -14,20 +14,21 @@ import (
 
 const createSession = `-- name: CreateSession :exec
 INSERT INTO "sessions" (
-  human_id, user_id, user_ip, user_agent, refresh_token, expires_at, created_by
+  human_id, user_id, user_ip, user_agent, business_id, refresh_token, expires_at, created_by
 ) VALUES (
-   $1, $2, $3, $4, $5, $6, $7
-) RETURNING id, human_id, user_ip, user_agent, refresh_token, user_id, expires_at, created_at, created_by, deleted_at, deleted_by
+   $1, $2, $3, $4, $5, $6, $7, $8
+) RETURNING id, human_id, user_ip, user_agent, refresh_token, user_id, business_id, expires_at, created_at, created_by, deleted_at, deleted_by
 `
 
 type CreateSessionParams struct {
-	HumanID      string    `json:"human_id"`
-	UserID       uuid.UUID `json:"user_id"`
-	UserIp       string    `json:"user_ip"`
-	UserAgent    string    `json:"user_agent"`
-	RefreshToken string    `json:"refresh_token"`
-	ExpiresAt    time.Time `json:"expires_at"`
-	CreatedBy    uuid.UUID `json:"created_by"`
+	HumanID      string     `json:"human_id"`
+	UserID       uuid.UUID  `json:"user_id"`
+	UserIp       string     `json:"user_ip"`
+	UserAgent    string     `json:"user_agent"`
+	BusinessID   *uuid.UUID `json:"business_id"`
+	RefreshToken string     `json:"refresh_token"`
+	ExpiresAt    time.Time  `json:"expires_at"`
+	CreatedBy    uuid.UUID  `json:"created_by"`
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) error {
@@ -36,6 +37,7 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) er
 		arg.UserID,
 		arg.UserIp,
 		arg.UserAgent,
+		arg.BusinessID,
 		arg.RefreshToken,
 		arg.ExpiresAt,
 		arg.CreatedBy,
@@ -53,7 +55,7 @@ func (q *Queries) DeleteSession(ctx context.Context, id uuid.UUID) error {
 }
 
 const findSessionByRefreshToken = `-- name: FindSessionByRefreshToken :one
-SELECT id, human_id, user_ip, user_agent, refresh_token, user_id, expires_at, created_at, created_by, deleted_at, deleted_by FROM "sessions" WHERE refresh_token = $1 AND expires_at > CURRENT_TIMESTAMP AND deleted_at IS NULL
+SELECT id, human_id, user_ip, user_agent, refresh_token, user_id, business_id, expires_at, created_at, created_by, deleted_at, deleted_by FROM "sessions" WHERE refresh_token = $1 AND expires_at > CURRENT_TIMESTAMP AND deleted_at IS NULL
 `
 
 func (q *Queries) FindSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error) {
@@ -66,6 +68,7 @@ func (q *Queries) FindSessionByRefreshToken(ctx context.Context, refreshToken st
 		&i.UserAgent,
 		&i.RefreshToken,
 		&i.UserID,
+		&i.BusinessID,
 		&i.ExpiresAt,
 		&i.CreatedAt,
 		&i.CreatedBy,
